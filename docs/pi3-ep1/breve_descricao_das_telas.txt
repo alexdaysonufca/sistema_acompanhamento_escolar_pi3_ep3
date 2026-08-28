@@ -1,0 +1,29 @@
+Breve descrição das telas (analise as imagens em anexo das telas para verificar mais detalhes).
+ESTRUTURA GLOBAL E COMPONENTES COMUNS (Persistentes em todas as telas)
+•	BARRA DE ACESSIBILIDADE GLOBAL (Topo extremo): Botões horizontais com alto contraste para 'Ir para o conteúdo', 'Ir para menu', 'Alto contraste', 'Fonte: A+', 'Fonte: A-' e o ícone universal de Acessibilidade.
+•	HEADER PERSISTENTE: Barra com a Logomarca, título 'Painel escolar', ícone de notificações (Sino) e avatar de perfil.
+TELA 1: DASHBOARD DO RESPONSÁVEL (Home Pais)
+•	Saudação 'Olá, Maria!'. Widget superior 'ALERTAS IMPORTANTES' com botão de fechar (X) [Prevenção de Erros]. Lista interna com ícone de atenção: 'João Silva: Frequência abaixo de 75% em Matemática', 'Ana Silva: Nota baixa em Português (4,5)'.
+•	Seção 'MEUS FILHOS': Grid com dois cards. Card 1 (Ana Silva, 6º Ano | Média: 5,8 [Alerta] | Faltas: 8 (20%) [Alerta]). Card 2 (João Silva, 9º Ano | Média: 7,2 [Check]). Ambos contêm um botão cinza 'Detalhes' [Link para a Tela 2].
+•	MENU RÁPIDO (Rodapé): Grid de 6 botões em formato de card: 'Boletim' [Link para Tela 2], 'Notas' [Link para Tela 3], 'Frequência' [Link para Tela 4], 'Avisos' [Link para Tela 5], 'Perfil', 'Suporte'.
+TELA 2: BOLETIM ESCOLAR (Módulo Pais)
+•	Link de retorno '⬅️ Voltar' [Link para Tela 1]. Título 'Boletim'.
+•	Dropdowns acessíveis com rótulo descritivo (label): 'Selecionar Aluno(a): João Silva Oliveira' e 'Selecionar Ano: 2026'.
+•	Tabela de Rendimento com cabeçalhos claros semânticos. Colunas: Disciplina, Professor(a), 1º Bim, 2º Bim, 3º Bim, 4º Bim, Média, Status. No rodapé da tabela, caixa de Legenda: '✓ Aprovado (≥ 6.0) | ⚠ Recuperação (4.0 - 5.9) | ✕ Reprovado (< 4.0)' [Reconhecimento em vez de recall].
+•	Seção 'AÇÕES': Botões de alto contraste com ícones para 'Imprimir', 'Baixar PDF', 'Enviar Email', 'Ver Notas' [Link para Tela 3].
+TELA 3: NOTAS DETALHADAS (Módulo Pais)
+•	Link de retorno '⬅️ Voltar' [Link para Tela 2]. Filtros: Aluno, Ano e 'Selecionar Disciplina: Português'.
+•	Tabelas separadas por '1º Bimestre' e '2º Bimestre', listando: Avaliação, Tipo, Peso, Nota, Status. Linha final exibindo 'Média Ponderada'. No rodapé, o card descritivo 'Média Anual: 8,04 ✓' e a fórmula 'Σ(nota × peso) / Σ(peso)' explicitada.
+TELA 4: FREQUÊNCIA E CALENDÁRIO (Módulo Pais)
+•	Título 'Frequência - João Silva Oliveira - 2026'. Dropdowns de filtro para Aluno, Disciplina, Mês (Março) e Ano.
+•	Card de Resumo Atual: Presenças (18/20), Faltas (02), Faltas Justificadas (01), Limite Mínimo (75%).
+•	Grid de Calendário Visual: Quadrados com os dias e letras indicativas de status. Dia 11 realçado em contraste cinza-escuro com o rótulo '[F*]' (Falta Justificada). Rodapé com Legenda clara. Lista de 'JUSTIFICATIVAS REGISTRADAS' e botões 'Solicitar Justificativa' e 'Imprimir Extrato'.
+TELA 5: MURAL DE AVISOS (Módulo Pais)
+•	Filtros por Tipo e Status. Tag ativa 'Avisos Não Lidos'. Cards brancos expansíveis com título em negrito (ex: 'IMPORTANTE: Reunião de Pais'), tag de categoria 'Importante', botões internos 'Ler completo' e 'Marcar Como Lido'. Abaixo, seção sanfona (accordion) colapsável para 'Avisos Já Lidos'. Checkbox 'Inscrever-se em notificações por e-mail'.
+TELA 6 (NOVA): PAINEL DE LANÇAMENTO DO PROFESSOR (Módulo Docente - Alimenta as Telas 2, 3 e 4)
+•	Título 'Área do Docente - Lançamento Acadêmico'.
+•	SELETORES DE ESCOPO [Flexibilidade e Eficiência de Uso]: Dropdowns acessíveis com labels claras para 'Selecionar Turma' (ex: 9º Ano A - Manhã), 'Selecionar Disciplina' (ex: Português) e 'Tipo de Registro' (Dropdown com as opções: 'Notas/Avaliações' ou 'Frequência Diária').
+•	FLUXO DE ENTRADA DE DADOS EM GRID [Prevenção de Erros e Controle do Usuário]:
+•	Se selecionado 'Notas': Exibir uma tabela com a lista de alunos da turma. Colunas: Foto/ID, Nome do Aluno, Input de Texto numérico para 'Nota 1º Bimestre', Input para 'Nota 2º Bimestre'. Os campos de input devem ter feedback visual imediato (borda verde se valor válido entre 0 e 10; mensagem de erro com alto contraste se valor inválido) [Compatibilidade com o sistema real/Validação de Domínio].
+•	Se selecionado 'Frequência': Exibir seletor de Data de Calendário (padrão ISO-8601 YYYY-MM-DD). Abaixo, a lista de alunos com uma Chave seletora (Toggle Switch) ou Checkbox acessível por teclado para alternar entre '[P] Presente' e '[F] Falta' de forma rápida para cada estudante.
+•	BOTÕES DE CONTROLE GERAL: Dois botões destacados no rodapé da tabela: Button 1 'Salvar Rascunho' (cor neutra de médio contraste) e Button 2 'Publicar no Sistema' (cor primária de alto contraste). Ao clicar em Publicar, exibir um modal de confirmação [Prevenção de Erros] com o texto: 'Deseja confirmar a publicação? Os dados serão enviados imediatamente para o painel dos responsáveis (Maria) nas Telas de Boletim e Frequência'.
