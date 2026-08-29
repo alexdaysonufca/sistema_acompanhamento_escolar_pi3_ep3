@@ -26,8 +26,31 @@ export default defineConfig({
   ],
   server: {
     port: 5173,
+    host: true, // Permite escuta em 0.0.0.0 e exposição no GitHub Codespaces / Docker
     proxy: {
       '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/docs': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        bypass(req) {
+          // Se a requisição for para arquivos estáticos (.md, .txt, etc.) ou subpastas de documentação, o Vite serve de public/
+          if (
+            req.url &&
+            (req.url.startsWith('/docs/pi') ||
+              req.url.startsWith('/docs/assets') ||
+              req.url.endsWith('.md') ||
+              req.url.endsWith('.txt'))
+          ) {
+            return req.url;
+          }
+        },
+      },
+      '/openapi.json': {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,

@@ -66,6 +66,7 @@ class TracesAPIHandler(BaseHTTPRequestHandler):
         body = to_json(data).encode("utf-8")
         self.send_response(status_code)
         self._set_cors_headers()
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -74,6 +75,7 @@ class TracesAPIHandler(BaseHTTPRequestHandler):
         body = html_content.encode("utf-8")
         self.send_response(status_code)
         self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -102,6 +104,23 @@ class TracesAPIHandler(BaseHTTPRequestHandler):
 
             if path in ["/openapi.json", "/api/openapi.json"]:
                 return self._send_json(OPENAPI_SPEC)
+
+            if path.startswith("/docs/") and path not in ["/docs", "/docs/"]:
+                # Servir documentos técnicos estáticos caso a requisição venha diretamente ao backend
+                clean_rel_path = path[len("/docs/"):].lstrip("/")
+                workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+                doc_file_path = os.path.join(workspace_root, "docs", clean_rel_path)
+                if os.path.exists(doc_file_path) and os.path.isfile(doc_file_path):
+                    with open(doc_file_path, "r", encoding="utf-8") as f:
+                        doc_text = f.read()
+                    body = doc_text.encode("utf-8")
+                    self.send_response(200)
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.send_header("Content-Type", "text/plain; charset=utf-8")
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
+                    return
 
             # 1. Health check
             if path == "/api/health" or path == "/api":
@@ -299,29 +318,48 @@ class TracesAPIHandler(BaseHTTPRequestHandler):
         print(f"[API TrAcEs] {self.address_string()} - {format % args}")
 
 
-def create_server(host: str = "127.0.0.1", port: int = 8000, db_path: Optional[str] = None) -> ThreadingHTTPServer:
+def create_server(
+    host: Optional[str] = None,
+    port: Optional[int] = None,
+    db_path: Optional[str] = None
+) -> ThreadingHTTPServer:
     """Cria instância multithreaded configurada do servidor HTTP."""
+    server_host = host if host is not None else os.getenv("HOST", "0.0.0.0")
+    server_port = port if port is not None else int(os.getenv("PORT", "8000"))
     TracesAPIHandler.setup_context(db_path)
-    return ThreadingHTTPServer((host, port), TracesAPIHandler)
+    return ThreadingHTTPServer((server_host, server_port), TracesAPIHandler)
 
 
-def run_api_server(host: str = "127.0.0.1", port: int = 8000, db_path: Optional[str] = None):
-    """Inicializa banco e executa o servidor em loop contínuo."""
-    print("=" * 60)
-    print("🚀 INICIALIZANDO SERVIDOR REST TRACES")
-    print("=" * 60)
+def run_api_server(
+    host: Optional[str] = None,
+    port: Optional[int] = None,
+    db_path: Optional[str] = None
+):
+    """Inicializa banco e executa o servidor em loop contínuo (compatível com local, Docker e Codespaces)."""
+    server_host = host if host is not None else os.getenv("HOST", "0.0.0.0")
+    server_port = port if port is not None else int(os.getenv("PORT", "8000"))
+
+    # Para logs amigáveis e links clicáveis no terminal Windows/Linux
+    display_host = "127.0.0.1" if server_host in ("0.0.0.0", "") else server_host
+
+    print("=" * 65, flush=True)
+    print("🚀 INICIALIZANDO SERVIDOR REST TRACES (CLEAN ARCHITECTURE)", flush=True)
+    print("=" * 65, flush=True)
     seed_database(db_path)
-    server = create_server(host, port, db_path)
-    print(f"📡 Servidor API REST ativo em http://{host}:{port}")
-    print(f"🔗 Healthcheck: http://{host}:{port}/api/health")
-    print("Pressione Ctrl+C para encerrar.")
-    print("=" * 60)
+    server = create_server(server_host, server_port, db_path)
+    print(f"📡 Servidor API REST ativo em http://{display_host}:{server_port} (bind: {server_host}:{server_port})", flush=True)
+    print(f"🔗 Healthcheck: http://{display_host}:{server_port}/api/health", flush=True)
+    print(f"📖 Swagger UI Live: http://{display_host}:{server_port}/docs", flush=True)
+    print(f"📄 OpenAPI Spec JSON: http://{display_host}:{server_port}/openapi.json", flush=True)
+    print("Pressione Ctrl+C para encerrar.", flush=True)
+    print("=" * 65, flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\n🛑 Servidor encerrado.")
+        print("\n🛑 Servidor encerrado.", flush=True)
         server.server_close()
 
 
 if __name__ == "__main__":
     run_api_server()
+

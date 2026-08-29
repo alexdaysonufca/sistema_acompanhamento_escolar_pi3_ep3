@@ -11,7 +11,7 @@ OPENAPI_SPEC = {
             "Desenvolvida sob os princípios da **Clean Architecture (4 Camadas: Domain, Application, Infrastructure, Presentation)** e padrão **MVC** em monorepo desacoplado, conecta o frontend SPA em React 18 / TypeScript 5 / Vite 6 / Tailwind CSS v4 (`frontend/`) "
             "ao servidor backend em Python 3.10+ e banco de dados relacional SQLite 3 (`backend/`).\n\n"
             "A Camada de Apresentação (`backend/src/presentation/`) isola os controladores REST e adaptadores HTTP dos casos de uso de aplicação (`backend/src/application/`) e da persistência (`backend/src/infrastructure/`), preservando a integridade das regras de negócio puras (`backend/src/domain/`).\n\n"
-            "Suporta operações completas de autenticação com Controle de Acesso Baseado em Papéis (RBAC com 3 Modos: Modo Pais com navegação familiar; Modo Docente exclusivo para lançamento acadêmico; Modo Desenvolvedor com menus para Documentação da API [Swagger UI], Integrantes, Sobre o Projeto e Documentação Técnica na íntegra), "
+            "Suporta operações completas de autenticação com Controle de Acesso Baseado em Papéis (RBAC com 3 Modos: Modo Pais com navegação familiar; Modo Docente exclusivo para lançamento acadêmico; Modo Desenvolvedor com menus para Documentação da API [Swagger UI], Documentação Técnica na íntegra com renderização interativa Mermaid e caixas de código JSON com syntax highlighting e cópia, Integrantes da Equipe e Sobre o Projeto), "
             "Acessibilidade Digital Universal de padrão SPA (WCAG 2.1 Nível AA: Gerenciamento Ativo de Foco via refs e tabindex programático, Anúncios Dinâmicos via ARIA Live Regions, Sincronização com History API do navegador e document.title dinâmico, Focus Trap e Restauração de Foco em todos os modais, Indicadores aria-busy=\"true\" e sr-only em requisições assíncronas, Suporte a prefers-reduced-motion e prefers-contrast, Alvos de Toque mínimos de 44x44px e Barra de Acessibilidade universal fixa e permanente no topo sticky top-0 z-50), "
             "acompanhamento escolar para pais e responsáveis (Boletim, Notas Detalhadas, Calendário de Frequência cobrindo todos os meses letivos de Fevereiro a Dezembro com seção de Grade Curricular, Horários e Vigência, Mural de Avisos com confirmação de leitura) "
             "e operações operacionais do corpo docente (Lançamento de notas em lote, chamadas mensais dinâmicas com seletores de escopo [Turma, Disciplina, Tipo, Bimestre, Ano], "
@@ -31,8 +31,8 @@ OPENAPI_SPEC = {
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000",
-            "description": "Servidor Local de Desenvolvimento (API REST)"
+            "url": "/",
+            "description": "API RESTful TrAcEs"
         }
     ],
     "tags": [

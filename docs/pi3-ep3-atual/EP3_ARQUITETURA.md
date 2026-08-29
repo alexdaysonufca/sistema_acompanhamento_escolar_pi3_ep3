@@ -31,6 +31,7 @@ O acompanhamento do rendimento e da assiduidade de estudantes é frequentemente 
 
 - **Responsáveis Legais (Família):** Perfil de consulta (`PARENT`). Acesso aos dependentes (*João Silva*, *Ana Silva*, *Pedro Costa*). Interface com alto contraste (7:1), zoom A+/A- e codificação semântica tripla.
 - **Corpo Docente (Professores):** Perfil operacional (`TEACHER`). Acesso à seleção de turmas, disciplinas, 3 modos de tabela acadêmica e gestão completa de avisos e comunicados com remetente formal e tags temáticas.
+- **Desenvolvedor & Avaliador Técnico (`DEVELOPER`):** Perfil de engenharia e auditoria técnica. Acesso ao painel especializado com 4 menus estruturados: **1. Documentação da API** (Swagger UI integrado via `/docs`), **2. Documentação Técnica** (Leitor com renderização interativa Mermaid e blocos de código com syntax highlighting), **3. Integrantes** (Identificação discente UFCA) e **4. Sobre** (Visão arquitetural e 79 testes).
 - **Secretaria e Administração:** Cadastro, enturmação e vinculação socioafetiva N:N entre responsáveis e alunos.
 
 ### 1.4 Stack Tecnológico e Justificativa de Engenharia
@@ -40,12 +41,13 @@ O ecossistema tecnológico do **TrAcEs (EP3)** foi selecionado sob os pilares da
 | Camada | Tecnologia / Ferramenta | Versão | Papel e Justificativa de Engenharia |
 | :--- | :--- | :---: | :--- |
 | **Frontend Framework** | **React** | `18.3.1` | Biblioteca declarativa baseada em componentes reativos, permitindo a construção de uma Single Page Application (SPA) fluida, com atualizações pontuais via Virtual DOM e sem recargas de página. |
-| **Frontend Tooling** | **Vite** | `6.3.5` | Bundler e servidor de desenvolvimento de última geração, oferecendo compilação ultrarrápida (*Hot Module Replacement - HMR*), minificação otimizada para produção e configuração de proxy reverso `/api`. |
+| **Frontend Tooling** | **Vite** | `6.3.5` | Bundler e servidor de desenvolvimento de última geração, oferecendo compilação ultrarrápida (*Hot Module Replacement - HMR*), minificação otimizada para produção, suporte a `host: true` para Codespaces e proxy reverso universal (`/api`, `/docs`, `/openapi.json`). |
 | **Linguagem Frontend** | **TypeScript** | `5.x` | Tipagem estática rigorosa que assegura a integridade dos contratos de dados (DTOs e interfaces da API REST), prevenindo falhas de runtime e acelerando a manutenibilidade do código. |
 | **Estilização & Design** | **Tailwind CSS** | `4.1.12` | Framework CSS utilitário de alta performance para implementação do Design System, tokens de cores acessíveis, classes de Alto Contraste nativo e folhas de estilo `@media print`. |
 | **Componentes UI & Ícones** | **Radix UI & Lucide React** | `1.x / 0.487` | Primitivas acessíveis headless (compatíveis com leitores de tela e navegação por teclado) e conjunto de ícones SVG semânticos para a codificação semântica tripla. |
+| **Diagramas Visuais** | **Mermaid.js** | `11.x` | Motor de renderização vetorial SVG interativo para exibição nítida dos diagramas arquiteturais e de sequência no leitor de documentação da SPA. |
 | **Backend Core** | **Python (Clean Architecture)** | `3.12+` | Linguagem base para a implementação das 4 camadas da Clean Architecture, encapsulando regras pedagógicas puras e validações invariantes sem dependência de bibliotecas externas pesadas. |
-| **Servidor HTTP & API** | **HTTPServer Nativo (RESTful)** | `Python 3.12` | Servidor HTTP assíncrono nativo com suporte a CORS, roteamento dinâmico e tratamento de erros padronizado em JSON. |
+| **Servidor HTTP & API** | **HTTPServer Nativo (RESTful)** | `Python 3.12` | Servidor HTTP com auto-reload inteligente nativo, suporte a CORS, roteamento dinâmico e tratamento de erros padronizado em JSON. |
 | **Documentação Interativa** | **OpenAPI & Swagger UI** | `3.0.3` | Padrão global para documentação e teste interativo dos 18 endpoints RESTful diretamente pelo navegador (`/docs` e `/swagger`). |
 | **Banco de Dados** | **SQLite** | `3.x` | Banco de dados relacional embarcado de alta performance com conformidade ACID, 12 tabelas físicas, restrições `CHECK` e 11 índices relacionais. |
 | **Testes Automatizados** | **Pytest** | `8.x / 9.x` | Framework de testes que executa a suíte de 79 testes automatizados (unitários, integração e E2E) com 100% de aprovação. |
@@ -617,6 +619,13 @@ A arquitetura de software do **TrAcEs** foi estruturada sob os pilares da engenh
   - **Isolamento de Diretórios:** Impede a varredura desnecessária e poluição de arquivos de cache em pastas do frontend (`node_modules/` e `dist/`).
   - **Injeção de PYTHONPATH:** Assegura que o interpretador Python reconheça o pacote `backend` universalmente para importação dos módulos das 4 camadas (`src.domain`, `src.application`, `src.infrastructure`, `src.presentation`).
   - **Usabilidade na Avaliação Acadêmica:** O professor e a banca avaliadora executam a bateria completa de 79 testes diretamente da raiz com um único comando (`python -m pytest`), sem necessidade de navegar manualmente de diretório.
+
+### 7.8 Arquitetura de Roteamento Universal (Local, GitHub Codespaces & Docker)
+
+- **Decisão:** O backend Python escuta em `0.0.0.0:8000` (`HOST = os.getenv("HOST", "0.0.0.0")`), o Vite opera com `server: { host: true }` e o proxy reverso intercepta `/api`, `/docs` e `/openapi.json`.
+- **Justificativa de Portabilidade:**
+  - **Eliminação de `ERR_CONNECTION_REFUSED` em Contêineres:** Em ambientes de nuvem e contêineres virtuais (como GitHub Codespaces e VS Code Remote), URLs absolutas como `http://127.0.0.1:8000/docs` apontam indevidamente para a máquina física do cliente. Ao adotar URLs relativas (`/docs`, `/openapi.json`) com proxy do Vite, todo o tráfego é roteado internamente de forma transparente.
+  - **Execução Híbrida sem Reconfiguração:** O mesmo código-fonte roda sem nenhuma alteração manual tanto no ambiente de desenvolvimento local (Windows/Linux/macOS) quanto em contêineres remotos ou pipelines de CI/CD.
 
 ---
 

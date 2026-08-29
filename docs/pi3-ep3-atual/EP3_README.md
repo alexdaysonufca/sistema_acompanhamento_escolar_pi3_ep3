@@ -47,7 +47,7 @@ Muitas escolas públicas de pequeno porte, projetos comunitários, ONGs e cursos
 - **Mural de Avisos com Confirmação de Leitura:** Emissão de comunicados institucionais com tags temáticas, remetente formal (`sender_role`) e carimbo de data/hora de leitura pelo responsável.
 - **Lançamento Ágil Docente:** Seletores de escopo em cascata, 4 modos de tabela, suporte a campos em branco para bimestres futuros e alternância de presença (`✓ Total ↔ ✖ Limpar`).
 - **Barra Universal de Acessibilidade WCAG 2.1 AA:** Tema de Alto Contraste nativo (7:1), redimensionamento proporcional de fontes em `rem` (80% a 140%), Skip Links e gerenciamento ativo de foco.
-- **Controle de Acesso RBAC com 3 Modos:** Perfis segregados para Família (`Modo: Pais`), Professor (`Modo: Docente`) e Engenharia (`Modo: Desenvolvedor`).
+- **Controle de Acesso RBAC com 3 Modos:** Perfis segregados para Família (`Modo: Pais`), Professor (`Modo: Docente`) e Engenharia (`Modo: Desenvolvedor` com Swagger UI, Documentação Técnica interativa com Mermaid e JSON syntax highlighting, Integrantes e Sobre).
 
 ---
 
@@ -57,7 +57,7 @@ A seleção da stack tecnológica do **TrAcEs** priorizou confiabilidade, portab
 
 | Categoria | Tecnologia / Ferramenta | Versão | Justificativa Técnica da Escolha |
 | :--- | :--- | :---: | :--- |
-| **Linguagem Backend** | **Python** | `3.12+` | Sintaxe expressiva, tipagem estática com `dataclasses` e robustez nativa para implementação pura de Clean Architecture sem dependência de frameworks externos pesados. |
+| **Linguagem Backend** | **Python** | `3.12+` | Sintaxe expressiva, tipagem estática com `dataclasses` e robustez nativa para implementação pura de Clean Architecture com auto-reload inteligente sem dependência de frameworks externos pesados. |
 | **Banco de Dados** | **SQLite 3** | `3.x` | Banco relacional embarcado serverless, transacional (ACID), com suporte nativo a chaves estrangeiras (`CASCADE`), restrições `CHECK` e índices de alta performance sem sobrecarga operacional. |
 | **Framework Frontend** | **React** | `18.3.1` | Biblioteca declarativa baseada em componentes reativos, permitindo renderização SPA ultrarrápida, controle de estado desacoplado e gerenciamento acessível da DOM. |
 | **Linguagem Frontend** | **TypeScript** | `5.x` | Segurança de tipos em tempo de compilação, prevenindo erros de tipagem entre as respostas JSON da API REST e os componentes visuais. |
@@ -65,6 +65,7 @@ A seleção da stack tecnológica do **TrAcEs** priorizou confiabilidade, portab
 | **Estilização e Tokens** | **Tailwind CSS** | `v4.0` | Framework CSS utilitário para design system consistente, suporte completo a tokens de acessibilidade, temas de alto contraste e layout responsivo. |
 | **Primitivas UI Acessíveis** | **Radix UI Primitives** | `1.x` | Componentes *headless* semânticos em conformidade com WAI-ARIA (Dialog, Select, Dropdown, Tabs, Focus Trap e restauração de foco). |
 | **Ícones Semânticos** | **Lucide React** | `0.487.0` | Conjunto leve de ícones vetoriais SVG de alta legibilidade para codificação semântica tripla (cor + ícone + texto). |
+| **Diagramas Visuais** | **Mermaid.js** | `11.x` | Motor de renderização de diagramas vetoriais SVG nítidos e interativos para documentação técnica e fluxos arquiteturais na SPA. |
 | **Especificação de API** | **OpenAPI / Swagger UI** | `3.0.3` | Padronização internacional de documentação de endpoints REST com interface visual interativa para experimentação ao vivo (*Try-it-Out*). |
 | **Framework de Testes** | **Pytest** | `9.0.2` | Framework avançado para testes automatizados unitários e de integração com asserções detalhadas e suporte a fixtures. |
 
@@ -261,27 +262,53 @@ Isso permite que qualquer usuário/avaliador abra a aplicação no navegador em 
 
 Em um terminal aberto na raiz do projeto:
 
+1. Criar o ambiente virtual:
+
 ```powershell
-# 1. Criar e ativar o ambiente virtual:
 python -m venv .venv
+```
 
-# Windows (PowerShell):
+2. Ativar o ambiente virtual:
+
+* Windows (PowerShell):
+
+```powershell
 .venv\Scripts\Activate.ps1
-# Windows (Git Bash):
+```
+
+* Windows (Git Bash):
+
+```bash
 source .venv/Scripts/activate
-# Linux/macOS:
+```
+
+* Linux / macOS:
+
+```bash
 source .venv/bin/activate
+```
 
-# 2. Acessar a pasta do backend:
+3. Acessar a pasta do backend:
+
+```powershell
 cd backend
+```
 
-# 3. Instalar as dependências do Python:
+4. Instalar as dependências do Python:
+
+```powershell
 pip install -r requirements.txt
+```
 
-# 4. Iniciar o servidor da API REST (modo contínuo na porta 8000):
+5. Iniciar o servidor da API REST (com auto-reload ativo na porta 8000):
+
+```powershell
 python main.py
+```
 
-# (Opcional) Executar simulação de demonstração no terminal:
+*(Opcional) Executar simulação de demonstração no terminal:*
+
+```powershell
 python main.py --demo
 ```
 
@@ -289,28 +316,47 @@ python main.py --demo
 
 Em um **segundo terminal** aberto na raiz do projeto:
 
+1. Acessar a pasta do frontend:
+
 ```powershell
-# 1. Acessar a pasta do frontend:
 cd frontend
+```
 
-# 2. Instalar as dependências do Node.js:
+2. Instalar as dependências do Node.js:
+
+```powershell
 npm install
+```
 
-# 3. Compilar o bundle de produção (validação estática de TypeScript):
+3. Compilar o bundle de produção (validação estática de TypeScript):
+
+```powershell
 npm run build
+```
 
-# 4. Iniciar o servidor de desenvolvimento Vite:
+4. Iniciar o servidor de desenvolvimento Vite:
+
+```powershell
 npm run dev
 ```
 
-### 4.3 Acesso ao Sistema e URLs Homologadas
+### 4.3 Acesso ao Sistema e URLs Homologadas (Local & GitHub Codespaces)
 
-Após a inicialização dos dois serviços, os seguintes acessos estarão disponíveis no navegador:
+O **TrAcEs** possui arquitetura de roteamento universal, funcionando identicamente em computadores locais e na nuvem (Codespaces / Docker / Dev Containers):
+
+#### 💻 1. Acesso em Ambiente Local (Físico)
 
 - **Aplicação Web Principal (Frontend SPA):** `http://localhost:5173`
-- **Documentação Interativa Swagger UI:** `http://127.0.0.1:8000/docs`
-- **Especificação OpenAPI JSON:** `http://127.0.0.1:8000/openapi.json`
-- **Diagnóstico do Servidor (Healthcheck):** `http://127.0.0.1:8000/api/health`
+- **Documentação Interativa Swagger UI (via Proxy Vite):** `http://localhost:5173/docs`
+- **Documentação Swagger UI Direta (Backend Python):** `http://127.0.0.1:8000/docs`
+- **Especificação OpenAPI JSON:** `http://127.0.0.1:8000/openapi.json` (ou `/openapi.json` via proxy)
+- **Diagnóstico do Servidor (Healthcheck):** `http://127.0.0.1:8000/api/health` (ou `/api/health` via proxy)
+
+#### ☁️ 2. Acesso em GitHub Codespaces / Dev Containers
+
+- **Aplicação Web SPA:** `https://<codespace-id>-5173.app.github.dev`
+- **Swagger UI Live Integrado:** `https://<codespace-id>-5173.app.github.dev/docs`
+- **Comportamento do Proxy:** O Vite (`host: true`) intercepta automaticamente as rotas `/api`, `/docs` e `/openapi.json` e as encaminha internamente para o backend Python (`0.0.0.0:8000`), eliminando qualquer erro de `ERR_CONNECTION_REFUSED`.
 
 ---
 
@@ -318,11 +364,15 @@ Após a inicialização dos dois serviços, os seguintes acessos estarão dispon
 
 O projeto conta com **79 testes automatizados** executados via `pytest` com 100% de aprovação:
 
-```powershell
-# Execução a partir da raiz:
-python -m pytest
+* Execução a partir da raiz:
 
-# Ou execução dentro da pasta backend:
+```powershell
+python -m pytest
+```
+
+* Ou execução dentro da pasta backend:
+
+```powershell
 cd backend
 python -m pytest tests
 ```
