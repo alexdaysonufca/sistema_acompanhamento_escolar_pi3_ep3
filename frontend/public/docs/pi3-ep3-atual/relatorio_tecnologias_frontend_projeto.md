@@ -32,7 +32,7 @@ O Frontend do **TrAcEs** é uma **Single Page Application (SPA)** de alta fideli
 frontend/
 ├── index.html                     # Entrypoint HTML5 semântico com meta tags e fontes
 ├── package.json                   # Dependências e scripts de execução (build, dev)
-├── vite.config.ts                 # Configuração do Vite com proxy reverso /api -> http://127.0.0.1:8000
+├── vite.config.ts                 # Configuração do Vite com host: true e proxy reverso (/api, /docs, /openapi.json)
 ├── postcss.config.mjs             # Configuração do Tailwind CSS
 ├── default_shadcn_theme.css       # Tokens e variáveis do Shadcn UI
 ├── public/                        # Ativos públicos e imagens vetoriais SVG
@@ -65,7 +65,7 @@ frontend/
 | :--- | :---: | :--- |
 | **React** | `18.3.1` | Biblioteca base para criação da interface declarativa baseada em componentes. |
 | **TypeScript** | `5.x` | Tipagem estática rigorosa para contratos de API, estados e propriedades de componentes. |
-| **Vite** | `6.3.5` | Bundler e servidor de desenvolvimento ultrarrápido com Hot Module Replacement (HMR). |
+| **Vite** | `6.3.5` | Bundler e servidor de desenvolvimento ultrarrápido com Hot Module Replacement (HMR), `host: true` para Codespaces e proxy reverso universal (`/api`, `/docs`, `/openapi.json`). |
 | **Tailwind CSS** | `4.1.12` | Framework CSS utilitário para estilização performática e design tokens. |
 | **Lucide React** | `0.487.0` | Conjunto completo de ícones SVG semânticos de alta legibilidade. |
 | **Radix UI Primitives** | `1.x` | Primitivas headless acessíveis (Dialog, Select, Dropdown, Tabs, Tooltip). |
@@ -139,13 +139,13 @@ O arquivo [`frontend/src/app/App.tsx`](file:///c:/Users/Dayson/Documents/pi_3_ep
       - *Modal de Avisos:* Criação/edição sem tags pré-selecionadas, paleta com 7 cores para tags personalizadas e integração direta com o mural dos pais.
     - **Prevenção de Erros (Nielsen #5):** Modal de confirmação obrigatório antes de gravar permanentemente no SQLite.
 7. **`SwaggerApiScreen` (Documentação da API RESTful):**
-   - Visualizador integrado do Swagger UI com botão para abertura instantânea em nova aba (`http://127.0.0.1:8000/docs`).
-8. **`IntegrantesScreen` (Integrantes da Equipe):**
+   - Visualizador integrado do Swagger UI via rota relativa (`/docs`) e botão para abertura instantânea em nova aba, com suporte total a execução local e remota (Codespaces / Docker).
+8. **`DocsMarkdownScreen` (Documentação Técnica):**
+   - Leitor interativo com seletor *dropdown* para renderização na íntegra de todos os arquivos de documentação técnica do diretório `docs/pi3-ep3-atual/`, incluindo formatação de itálico (*texto*), negrito (**texto**), expressões matemáticas LaTeX limpas ($...$), tabelas estruturadas, caixas isoladas com syntax highlighting/cópia de código e **renderização visual interativa de diagramas Mermaid** (arquitetura, fluxo de integração e sequência).
+9. **`IntegrantesScreen` (Integrantes da Equipe):**
    - Apresentação acadêmica dos discentes Antonio Alex Dayson Tomaz e Maria Alexsandra Tomaz da Universidade Federal do Cariri (UFCA).
-9. **`SobreScreen` (Sobre o Projeto):**
-   - Apresentação técnica do projeto TrAcEs, Clean Architecture, suíte de 79 testes automatizados e utilidade social.
-10. **`DocsMarkdownScreen` (Documentação Técnica):**
-    - Leitor interativo com seletor *dropdown* para renderização na íntegra de todos os arquivos de documentação técnica do diretório `docs/pi3-ep3-atual/`, incluindo formatação de itálico (*texto*), negrito (**texto**), expressões matemáticas LaTeX limpas ($...$), tabelas e estatísticas de linhas.
+10. **`SobreScreen` (Sobre o Projeto):**
+    - Apresentação técnica do projeto TrAcEs, Clean Architecture, suíte de 79 testes automatizados e utilidade social.
 
 ---
 

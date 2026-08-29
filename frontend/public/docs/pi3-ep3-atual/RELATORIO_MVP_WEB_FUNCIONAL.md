@@ -60,10 +60,10 @@ O desenvolvimento do **MVP Web Funcional (EP3)** foi concluído com rigor, integ
 
 ### 2.3 Módulo do Desenvolvedor (Equipe Dev)
 
-- **Documentação da API:** Acesso direto e integrado ao Swagger UI (`http://127.0.0.1:8000/docs`) com suporte a execução assíncrona multithread (`ThreadingHTTPServer`).
-- **Integrantes:** Apresentação acadêmica oficial dos integrantes da equipe discente da Universidade Federal do Cariri (UFCA).
-- **Sobre:** Painel analítico detalhando a Clean Architecture, utilidade social e componente extensionista.
-- **Documentação Técnica:** Visualizador interativo e responsivo que carrega e renderiza na íntegra todos os documentos técnicos do projeto com tratamento tipográfico, suporte a LaTeX e sintaxe Markdown limpa.
+- **1. Documentação da API:** Acesso direto e integrado ao Swagger UI via rota relativa (`/docs`) ou direta (`http://127.0.0.1:8000/docs`) com suporte a execução assíncrona multithread (`ThreadingHTTPServer`) e compatibilidade universal com Codespaces/Docker.
+- **2. Documentação Técnica:** Visualizador interativo e responsivo que carrega e renderiza na íntegra todos os documentos técnicos do projeto com tratamento tipográfico, suporte a LaTeX, renderização visual interativa de diagramas Mermaid e caixas isoladas de código com syntax highlighting JSON e botão de cópia instantânea.
+- **3. Integrantes:** Apresentação acadêmica oficial dos integrantes da equipe discente da Universidade Federal do Cariri (UFCA).
+- **4. Sobre:** Painel analítico detalhando a Clean Architecture, utilidade social e componente extensionista.
 
 ---
 
@@ -84,6 +84,7 @@ O desenvolvimento do **MVP Web Funcional (EP3)** foi concluído com rigor, integ
 | **Heurística #3 (Liberdade)** | Links de retorno "⬅️ Voltar ao Painel" em todas as telas e fechamento universal com tecla `Escape`. |
 | **Heurística #5 (Prevenção de Erros)** | Modal de confirmação obrigatório com resumo dos dados antes de gravar no banco SQLite. |
 | **Heurística #6 (Reconhecimento)** | Legendas fixas de faixas de notas e status em todas as tabelas. |
+| **Heurística #7 (Eficiência de Uso)** | Caixas isoladas de código com syntax highlighting, preservação de indentação e botão de cópia instantânea de payloads e comandos. |
 | **Heurística #9 (Recuperação de Erros)** | Inputs de notas com validação em tempo real, `aria-invalid` dinâmico e mensagens contextuais de erro. |
 
 ---
@@ -137,8 +138,8 @@ cd backend
 python main.py
 ```
 
-* API REST: `http://127.0.0.1:8000`
-* Swagger UI Live: `http://127.0.0.1:8000/docs`
+* API REST (Local): `http://127.0.0.1:8000`
+* Swagger UI Live: `http://localhost:5173/docs` (ou `http://127.0.0.1:8000/docs`)
 
 ### 2. Iniciar a Aplicação Frontend SPA (Porta 5173)
 

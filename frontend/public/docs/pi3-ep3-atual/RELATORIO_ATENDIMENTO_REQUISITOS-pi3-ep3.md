@@ -56,12 +56,15 @@ O objetivo foi entregar um sistema **robusto, auditável, resiliente e inclusivo
 ### 3.3 API RESTful Nativa e OpenAPI 3.0.3 (Requisito 3)
 
 - **18 Endpoints Completos:** Suporte a operações `GET`, `POST` e `PUT`.
-- **Documentação Swagger UI Live:** Acesso interativo em `http://127.0.0.1:8000/docs`, permitindo testar requisições diretamente pelo navegador.
+- **Documentação Swagger UI Live:** Acesso interativo em `http://localhost:5173/docs` (ou direto em `:8000/docs`), permitindo testar requisições diretamente pelo navegador.
 - **Tratamento de Erros:** Respostas com status HTTP semânticos (200, 201, 400, 404, 500) e corpo JSON padronizado.
 
 ### 3.4 Interface Web SPA e Usabilidade (Requisitos 4 e 7)
 
-- **6 Telas Funcionais:** Dashboard, Boletim Oficial (@media print), Notas Detalhadas, Frequência/Calendário Completo (todos os meses letivos de Fevereiro a Dezembro com seção de Grade Curricular, Horários e Vigência), Mural de Avisos e Área do Docente.
+- **10 Telas Funcionais (3 Modos RBAC):**
+  - *Modo Pais:* Dashboard, Boletim Oficial (@media print), Notas Detalhadas, Frequência/Calendário Completo (todos os meses letivos de Fevereiro a Dezembro com seção de Grade Curricular, Horários e Vigência) e Mural de Avisos.
+  - *Modo Docente:* Área do Docente Avançada com lançamento em lote, chamada mensal dinâmica e gestão de avisos.
+  - *Modo Desenvolvedor:* **1. Documentação da API** (Swagger UI integrado), **2. Documentação Técnica** (Leitor com suporte a Mermaid, JSON syntax highlighting e cópia), **3. Integrantes** (Identificação discente UFCA) e **4. Sobre** (Visão arquitetural e 79 testes).
 - **Área do Docente Avançada:**
   - Seletores interdependentes de Turma, Disciplina, Tipo de Registro (*Notas*, *Frequência*, *Avisos*), Bimestre/Visão (*1º BM*, *2º BM*, *3º BM*, *4º BM*, *Consolidado*), Avaliação e Ano (*2026 padrão*).
   - 5 Modos de Tabela (*Avaliação Específica*, *Todas com Peso `(Peso: X.X)`*, *Consolidado de Notas*, *Chamada Mensal Dinâmica* e *Consolidado de Frequência*).
@@ -77,6 +80,7 @@ O objetivo foi entregar um sistema **robusto, auditável, resiliente e inclusivo
   - *#1 Visibilidade:* Toasts dinâmicos de sucesso e erro.
   - *#3 Liberdade:* Links "Voltar ao Painel" e tecla `Escape`.
   - *#5 Prevenção de Erros:* Modal de confirmação antes de gravar no banco.
+  - *#7 Eficiência de Uso:* Caixas isoladas de código com syntax highlighting, preservação de indentação e botão de cópia instantânea de payloads e comandos.
   - *#9 Recuperação:* Borda verde/vermelha imediata em inputs de nota.
 
 ### 3.5 Acessibilidade Digital WCAG 2.1 Nível AA em SPA (Requisito 6)

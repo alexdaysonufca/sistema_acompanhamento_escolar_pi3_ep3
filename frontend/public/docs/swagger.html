@@ -1,257 +1,397 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Swagger UI — TrAcEs API RESTful</title>
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #fafafa;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .swagger-ui .topbar {
-      background-color: #1B4F8A;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    .custom-header {
-      background: linear-gradient(135deg, #1B4F8A 0%, #0F3B6C 100%);
-      color: white;
-      padding: 24px;
-      text-align: center;
-      border-bottom: 3px solid #FEF08A;
-    }
-    .custom-header h1 {
-      margin: 0 0 8px 0;
-      font-size: 1.8rem;
-    }
-    .custom-header p {
-      margin: 0;
-      opacity: 0.9;
-      font-size: 0.95rem;
-    }
-    .badge {
-      display: inline-block;
-      background: #FEF08A;
-      color: #1A2332;
-      font-weight: bold;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      margin-left: 8px;
-      text-transform: uppercase;
-    }
-  </style>
-</head>
-<body>
-  <header class="custom-header">
-    <h1>TrAcEs — Documentação Interativa da API <span class="badge">Swagger UI / OpenAPI 3.0</span></h1>
-    <p>Trilha de Acompanhamento Estudantil · Clean Architecture + Python 3.10+ + SQLite 3 + React 18</p>
-  </header>
-
-  <div id="swagger-ui"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js" crossorigin></script>
-  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js" crossorigin></script>
-  <script>
-    const spec = {
-      "openapi": "3.0.3",
-      "info": {
-        "title": "TrAcEs — Trilha de Acompanhamento Estudantil API",
-        "description": "API RESTful do sistema **TrAcEs (Trilha de Acompanhamento Escolar)**.\\n\\nClean Architecture (4 Camadas: Domain, Application, Infrastructure, Presentation) e padrão MVC em monorepo desacoplado (backend/ e frontend/).\\nSuporta autenticação com RBAC em 3 Modos (Pais, Docente e Desenvolvedor com Swagger UI, Integrantes, Sobre e Documentação Técnica), Acessibilidade SPA WCAG 2.1 AA (Gerenciamento Ativo de Foco, ARIA Live Regions, History API sync, Focus Trap em modais, prefers-reduced-motion, alvos 44x44px e Barra Fixa sticky top-0), módulo dos pais e módulo do docente.",
-        "version": "1.0.0",
-        "contact": { "name": "Equipe de Engenharia TrAcEs — ADS UFCA", "email": "traces@escola.edu.br" }
-      },
-      "servers": [
-        { "url": "http://127.0.0.1:8000", "description": "Servidor Local (API REST)" }
-      ],
-      "tags": [
-        { "name": "Sistema", "description": "Status e verificação de saúde da API" },
-        { "name": "Autenticação", "description": "Login e controle de perfil de usuário" },
-        { "name": "Módulo Responsável", "description": "Consultas acadêmicas para pais (Boletim, Notas, Frequência, Avisos)" },
-        { "name": "Módulo Docente", "description": "Lançamentos de notas e frequências em lote pelos professores" }
-      ],
-      "paths": {
-        "/api/health": {
-          "get": {
-            "tags": ["Sistema"],
-            "summary": "Healthcheck da API",
-            "responses": { "200": { "description": "API ativa e operante" } }
-          }
-        },
-        "/api/auth/login": {
-          "post": {
-            "tags": ["Autenticação"],
-            "summary": "Autenticação de Usuário (Login)",
-            "requestBody": {
-              "required": true,
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "email": { "type": "string", "example": "maria.silva@email.com" },
-                      "role": { "type": "string", "enum": ["PARENT", "TEACHER"], "example": "PARENT" }
-                    }
-                  }
-                }
-              }
-            },
-            "responses": { "200": { "description": "Login realizado com sucesso" } }
-          }
-        },
-        "/api/parent/dependents": {
-          "get": {
-            "tags": ["Módulo Responsável"],
-            "summary": "Listar Estudantes Dependentes",
-            "parameters": [{ "name": "parent_id", "in": "query", "schema": { "type": "integer", "default": 1 } }],
-            "responses": { "200": { "description": "Lista de dependentes com médias e assiduidade" } }
-          }
-        },
-        "/api/students/{student_id}/report-card": {
-          "get": {
-            "tags": ["Módulo Responsável"],
-            "summary": "Emitir Boletim Escolar",
-            "parameters": [
-              { "name": "student_id", "in": "path", "required": true, "schema": { "type": "integer", "example": 1 } },
-              { "name": "year", "in": "query", "schema": { "type": "integer", "default": 2026 } }
-            ],
-            "responses": { "200": { "description": "Boletim escolar consolidado com notas e médias anuais" } }
-          }
-        },
-        "/api/students/{student_id}/assessments": {
-          "get": {
-            "tags": ["Módulo Responsável"],
-            "summary": "Consultar Notas Detalhadas por Avaliação",
-            "parameters": [
-              { "name": "student_id", "in": "path", "required": true, "schema": { "type": "integer", "example": 1 } },
-              { "name": "subject", "in": "query", "schema": { "type": "string", "default": "Matemática" } },
-              { "name": "year", "in": "query", "schema": { "type": "integer", "default": 2026 } }
-            ],
-            "responses": { "200": { "description": "Detalhamento de provas, pesos e média ponderada" } }
-          }
-        },
-        "/api/students/{student_id}/attendance": {
-          "get": {
-            "tags": ["Módulo Responsável"],
-            "summary": "Consultar Calendário de Frequência",
-            "parameters": [
-              { "name": "student_id", "in": "path", "required": true, "schema": { "type": "integer", "example": 1 } },
-              { "name": "subject", "in": "query", "schema": { "type": "string", "default": "Matemática" } },
-              { "name": "month", "in": "query", "schema": { "type": "integer", "default": 3 } },
-              { "name": "year", "in": "query", "schema": { "type": "integer", "default": 2026 } }
-            ],
-            "responses": { "200": { "description": "Grade mensal de frequência com presenças e faltas justificadas" } }
-          }
-        },
-        "/api/parent/announcements": {
-          "get": {
-            "tags": ["Módulo Responsável"],
-            "summary": "Consultar Mural de Avisos",
-            "responses": { "200": { "description": "Lista de avisos institucionais" } }
-          }
-        },
-        "/api/teacher/classes": {
-          "get": {
-            "tags": ["Módulo Docente"],
-            "summary": "Consultar Turmas e Estudantes do Professor",
-            "parameters": [{ "name": "teacher_id", "in": "query", "schema": { "type": "integer", "default": 1 } }],
-            "responses": { "200": { "description": "Escopo de turmas e lista de estudantes" } }
-          }
-        },
-        "/api/teacher/grades/bulk": {
-          "post": {
-            "tags": ["Módulo Docente"],
-            "summary": "Lançamento de Notas em Lote",
-            "requestBody": {
-              "required": true,
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "required": ["assessment_id", "graded_by", "grades"],
-                    "properties": {
-                      "assessment_id": { "type": "integer", "example": 1 },
-                      "graded_by": { "type": "string", "example": "Prof. Carlos Mendes" },
-                      "grades": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "student_id": { "type": "integer", "example": 1 },
-                            "score": { "type": "number", "minimum": 0.0, "maximum": 10.0, "example": 9.5 }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "responses": { "201": { "description": "Notas salvas com sucesso no banco de dados SQLite" } }
-          }
-        },
-        "/api/teacher/attendance/bulk": {
-          "post": {
-            "tags": ["Módulo Docente"],
-            "summary": "Registro de Chamada Diária em Lote",
-            "requestBody": {
-              "required": true,
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "required": ["date", "subject", "records"],
-                    "properties": {
-                      "date": { "type": "string", "format": "date", "example": "2026-03-25" },
-                      "subject": { "type": "string", "example": "Matemática" },
-                      "classroom_id": { "type": "integer", "example": 1 },
-                      "records": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "student_id": { "type": "integer", "example": 1 },
-                            "is_present": { "type": "boolean", "example": true }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "responses": { "201": { "description": "Chamada registrada com sucesso" } }
-          }
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Swagger UI — TrAcEs API RESTful</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fafafa;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
       }
-    };
+      .swagger-ui .topbar {
+        background-color: #1b4f8a;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      .custom-header {
+        background: linear-gradient(135deg, #1b4f8a 0%, #0f3b6c 100%);
+        color: white;
+        padding: 24px;
+        text-align: center;
+        border-bottom: 3px solid #fef08a;
+      }
+      .custom-header h1 {
+        margin: 0 0 8px 0;
+        font-size: 1.8rem;
+      }
+      .custom-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 0.95rem;
+      }
+      .badge {
+        display: inline-block;
+        background: #fef08a;
+        color: #1a2332;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        margin-left: 8px;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="custom-header">
+      <h1>
+        TrAcEs — Documentação Interativa da API
+        <span class="badge">Swagger UI / OpenAPI 3.0</span>
+      </h1>
+      <p>
+        Trilha de Acompanhamento Estudantil · Clean Architecture + Python 3.10+
+        + SQLite 3 + React 18
+      </p>
+    </header>
 
-    window.onload = function() {
-      window.ui = SwaggerUIBundle({
-        spec: spec,
-        dom_id: '#swagger-ui',
-        deepLinking: true,
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
+    <div id="swagger-ui"></div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js"
+      crossorigin
+    ></script>
+    <script>
+      const spec = {
+        openapi: "3.0.3",
+        info: {
+          title: "TrAcEs — Trilha de Acompanhamento Estudantil API",
+          description:
+            "API RESTful do sistema **TrAcEs (Trilha de Acompanhamento Escolar)**.\\n\\nClean Architecture (4 Camadas: Domain, Application, Infrastructure, Presentation) e padrão MVC em monorepo desacoplado (backend/ e frontend/).\\nSuporta autenticação com RBAC em 3 Modos (Pais, Docente e Desenvolvedor com Swagger UI, Integrantes, Sobre e Documentação Técnica), Acessibilidade SPA WCAG 2.1 AA (Gerenciamento Ativo de Foco, ARIA Live Regions, History API sync, Focus Trap em modais, prefers-reduced-motion, alvos 44x44px e Barra Fixa sticky top-0), módulo dos pais e módulo do docente.",
+          version: "1.0.0",
+          contact: {
+            name: "Equipe de Engenharia TrAcEs — ADS UFCA",
+            email: "traces@escola.edu.br",
+          },
+        },
+        servers: [
+          {
+            url: "/",
+            description: "API RESTful TrAcEs",
+          },
         ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
+        tags: [
+          {
+            name: "Sistema",
+            description: "Status e verificação de saúde da API",
+          },
+          {
+            name: "Autenticação",
+            description: "Login e controle de perfil de usuário",
+          },
+          {
+            name: "Módulo Responsável",
+            description:
+              "Consultas acadêmicas para pais (Boletim, Notas, Frequência, Avisos)",
+          },
+          {
+            name: "Módulo Docente",
+            description:
+              "Lançamentos de notas e frequências em lote pelos professores",
+          },
         ],
-        layout: "BaseLayout",
-        defaultModelsExpandDepth: 1,
-        defaultModelExpandDepth: 1,
-        docExpansion: "list",
-        filter: true,
-        showExtensions: true,
-        showCommonExtensions: true,
-        supportedSubmitMethods: ["get", "post", "put", "delete", "options"]
-      });
-    };
-  </script>
-</body>
+        paths: {
+          "/api/health": {
+            get: {
+              tags: ["Sistema"],
+              summary: "Healthcheck da API",
+              responses: { 200: { description: "API ativa e operante" } },
+            },
+          },
+          "/api/auth/login": {
+            post: {
+              tags: ["Autenticação"],
+              summary: "Autenticação de Usuário (Login)",
+              requestBody: {
+                required: true,
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        email: {
+                          type: "string",
+                          example: "maria.silva@email.com",
+                        },
+                        role: {
+                          type: "string",
+                          enum: ["PARENT", "TEACHER"],
+                          example: "PARENT",
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              responses: {
+                200: { description: "Login realizado com sucesso" },
+              },
+            },
+          },
+          "/api/parent/dependents": {
+            get: {
+              tags: ["Módulo Responsável"],
+              summary: "Listar Estudantes Dependentes",
+              parameters: [
+                {
+                  name: "parent_id",
+                  in: "query",
+                  schema: { type: "integer", default: 1 },
+                },
+              ],
+              responses: {
+                200: {
+                  description: "Lista de dependentes com médias e assiduidade",
+                },
+              },
+            },
+          },
+          "/api/students/{student_id}/report-card": {
+            get: {
+              tags: ["Módulo Responsável"],
+              summary: "Emitir Boletim Escolar",
+              parameters: [
+                {
+                  name: "student_id",
+                  in: "path",
+                  required: true,
+                  schema: { type: "integer", example: 1 },
+                },
+                {
+                  name: "year",
+                  in: "query",
+                  schema: { type: "integer", default: 2026 },
+                },
+              ],
+              responses: {
+                200: {
+                  description:
+                    "Boletim escolar consolidado com notas e médias anuais",
+                },
+              },
+            },
+          },
+          "/api/students/{student_id}/assessments": {
+            get: {
+              tags: ["Módulo Responsável"],
+              summary: "Consultar Notas Detalhadas por Avaliação",
+              parameters: [
+                {
+                  name: "student_id",
+                  in: "path",
+                  required: true,
+                  schema: { type: "integer", example: 1 },
+                },
+                {
+                  name: "subject",
+                  in: "query",
+                  schema: { type: "string", default: "Matemática" },
+                },
+                {
+                  name: "year",
+                  in: "query",
+                  schema: { type: "integer", default: 2026 },
+                },
+              ],
+              responses: {
+                200: {
+                  description:
+                    "Detalhamento de provas, pesos e média ponderada",
+                },
+              },
+            },
+          },
+          "/api/students/{student_id}/attendance": {
+            get: {
+              tags: ["Módulo Responsável"],
+              summary: "Consultar Calendário de Frequência",
+              parameters: [
+                {
+                  name: "student_id",
+                  in: "path",
+                  required: true,
+                  schema: { type: "integer", example: 1 },
+                },
+                {
+                  name: "subject",
+                  in: "query",
+                  schema: { type: "string", default: "Matemática" },
+                },
+                {
+                  name: "month",
+                  in: "query",
+                  schema: { type: "integer", default: 3 },
+                },
+                {
+                  name: "year",
+                  in: "query",
+                  schema: { type: "integer", default: 2026 },
+                },
+              ],
+              responses: {
+                200: {
+                  description:
+                    "Grade mensal de frequência com presenças e faltas justificadas",
+                },
+              },
+            },
+          },
+          "/api/parent/announcements": {
+            get: {
+              tags: ["Módulo Responsável"],
+              summary: "Consultar Mural de Avisos",
+              responses: {
+                200: { description: "Lista de avisos institucionais" },
+              },
+            },
+          },
+          "/api/teacher/classes": {
+            get: {
+              tags: ["Módulo Docente"],
+              summary: "Consultar Turmas e Estudantes do Professor",
+              parameters: [
+                {
+                  name: "teacher_id",
+                  in: "query",
+                  schema: { type: "integer", default: 1 },
+                },
+              ],
+              responses: {
+                200: { description: "Escopo de turmas e lista de estudantes" },
+              },
+            },
+          },
+          "/api/teacher/grades/bulk": {
+            post: {
+              tags: ["Módulo Docente"],
+              summary: "Lançamento de Notas em Lote",
+              requestBody: {
+                required: true,
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      required: ["assessment_id", "graded_by", "grades"],
+                      properties: {
+                        assessment_id: { type: "integer", example: 1 },
+                        graded_by: {
+                          type: "string",
+                          example: "Prof. Carlos Mendes",
+                        },
+                        grades: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              student_id: { type: "integer", example: 1 },
+                              score: {
+                                type: "number",
+                                minimum: 0.0,
+                                maximum: 10.0,
+                                example: 9.5,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              responses: {
+                201: {
+                  description:
+                    "Notas salvas com sucesso no banco de dados SQLite",
+                },
+              },
+            },
+          },
+          "/api/teacher/attendance/bulk": {
+            post: {
+              tags: ["Módulo Docente"],
+              summary: "Registro de Chamada Diária em Lote",
+              requestBody: {
+                required: true,
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      required: ["date", "subject", "records"],
+                      properties: {
+                        date: {
+                          type: "string",
+                          format: "date",
+                          example: "2026-03-25",
+                        },
+                        subject: { type: "string", example: "Matemática" },
+                        classroom_id: { type: "integer", example: 1 },
+                        records: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              student_id: { type: "integer", example: 1 },
+                              is_present: { type: "boolean", example: true },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              responses: {
+                201: { description: "Chamada registrada com sucesso" },
+              },
+            },
+          },
+        },
+      };
+
+      window.onload = function () {
+        window.ui = SwaggerUIBundle({
+          spec: spec,
+          dom_id: "#swagger-ui",
+          deepLinking: true,
+          presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+          plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+          layout: "BaseLayout",
+          defaultModelsExpandDepth: 1,
+          defaultModelExpandDepth: 1,
+          docExpansion: "list",
+          filter: true,
+          showExtensions: true,
+          showCommonExtensions: true,
+          supportedSubmitMethods: ["get", "post", "put", "delete", "options"],
+        });
+      };
+    </script>
+  </body>
 </html>

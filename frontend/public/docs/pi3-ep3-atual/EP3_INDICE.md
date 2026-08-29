@@ -25,16 +25,16 @@ O **Entregável Parcial 3 (EP3)** concretiza a evolução integral do projeto **
    - Validações invariantes no domínio (CPFs com cálculo de dígitos verificadores, notas entre 0.0 e 10.0, e-mails formatados).
 2. **API RESTful Nativa & Swagger UI Live (OpenAPI 3.0.3):**
    - Servidor HTTP nativo assíncrono com suporte a CORS e tratamento global de erros em JSON.
-   - **18 Endpoints Documentados e Funcionais** acessíveis interativamente em `http://127.0.0.1:8000/docs`.
+   - **18 Endpoints Documentados e Funcionais** acessíveis interativamente em `http://localhost:5173/docs` (ou direto em `:8000/docs`).
    - Suporte a operações de Consulta (`GET`), Criação (`POST`) e Atualização (`PUT`).
 3. **Frontend SPA de Alta Fidelidade (React 18 + TypeScript 5 + Vite 6 + Tailwind CSS v4 em `frontend/`):**
-   - Interface com 6 telas dinâmicas: *Dashboard do Responsável*, *Boletim Escolar*, *Notas Detalhadas (Read-Only)*, *Frequência e Calendário*, *Mural de Avisos e Comunicados* e *Área do Docente*.
-   - **Controle de Acesso Baseado em Papéis (RBAC):** Perfil de Responsável Legal (*Maria Silva*) e Perfil de Docente (*Prof. Carlos Mendes*).
+   - Interface com 10 telas dinâmicas cobrindo 3 Modos RBAC: *Pais* (Dashboard, Boletim, Notas, Frequência, Avisos), *Docente* (Lançamento em lote, chamada dinâmica e avisos) e *Desenvolvedor* (**1. Documentação da API**, **2. Documentação Técnica** com diagramas Mermaid e syntax highlighting JSON, **3. Integrantes** e **4. Sobre**).
+   - **Controle de Acesso Baseado em Papéis (RBAC):** Alternância instantânea de perfis (Responsável, Docente e Desenvolvedor).
    - Suporte aos **3 Dependentes da Família:** *João Silva Oliveira* (ID 1), *Ana Silva Oliveira* (ID 2) e *Pedro Costa Santos* (ID 3).
-   - **Área do Docente Avançada:** 5 seletores de escopo, 4 modos de tabela (*Avaliação Específica*, *Todas as Avaliações com Peso* no formato `(Peso: X.X)`, *Consolidado Anual* e *Gestão de Avisos*), botão `+ Adicionar Avaliação para a Turma`, botão `✏️ Editar Avaliação` e botão `+ Novo Aviso / Comunicado`.
+   - **Área do Docente Avançada:** 5 seletores de escopo, 5 modos de tabela acadêmica, botão de coluna alternável `✓ Total` $\leftrightarrow$ `✖ Limpar`, botão `+ Adicionar Avaliação para a Turma`, botão `✏️ Editar Avaliação` e botão `+ Novo Aviso / Comunicado`.
 4. **Garantia de Qualidade e Acessibilidade:**
-   - Suíte de **79 Testes Automatizados no pytest** (100% de sucesso em ~3.3s).
-   - Barra de Acessibilidade com Alto Contraste nativo (7:1), zoom A+/A- (80% a 140%), Skip Links e codificação semântica tripla.
+   - Suíte de **79 Testes Automatizados no pytest** (100% de sucesso em ~3.0s).
+   - Barra de Acessibilidade com Alto Contraste nativo (7:1), zoom A+/A- (80% a 140%), Skip Links, codificação semântica tripla e Heurística #7 com cópia instantânea de código.
 
 ---
 
@@ -106,7 +106,7 @@ MÉTRICAS DO SISTEMA (EP3):
 ### Para o Desenvolvedor Backend / Engenheiro de Dados
 
 1. Consulte o [`EP3_ARQUITETURA.md`](file:///c:/Users/Dayson/Documents/pi_3_ep_3_-_v_1/docs/pi3-ep3-atual/EP3_ARQUITETURA.md) para entender a divisão de camadas na Clean Architecture.
-2. Acesse o Swagger UI interativo em `http://127.0.0.1:8000/docs` para testar os endpoints.
+2. Acesse o Swagger UI interativo em `http://localhost:5173/docs` (ou direto em `:8000/docs`) para testar os endpoints.
 3. Inspecione a estrutura SQL em [`backend/src/infrastructure/schema.sql`](file:///c:/Users/Dayson/Documents/pi_3_ep_3_-_v_1/backend/src/infrastructure/schema.sql) e os repositórios em [`backend/src/infrastructure/database.py`](file:///c:/Users/Dayson/Documents/pi_3_ep_3_-_v_1/backend/src/infrastructure/database.py).
 
 ### Para o Desenvolvedor Frontend / Designer UX
@@ -119,26 +119,36 @@ MÉTRICAS DO SISTEMA (EP3):
 
 ## 🚀 6. Guia Rápido de Execução da Aplicação
 
-```powershell
-# 1. Executar a suíte de 79 testes automatizados no Backend:
-python -m pytest
+1. Executar a suíte de 79 testes automatizados no Backend:
 
-# 2. Iniciar o Servidor Backend da API REST (Porta 8000):
+```powershell
+python -m pytest
+```
+
+2. Iniciar o Servidor Backend da API REST (com auto-reload ativo na porta 8000):
+
+```powershell
 cd backend
 python main.py
+```
 
-# (Opcional) Executar simulação de demonstração no terminal:
+*(Opcional) Executar simulação de demonstração no terminal:*
+
+```powershell
 python main.py --demo
+```
 
-# 3. Iniciar o Frontend React SPA (Porta 5173):
+3. Iniciar o Frontend React SPA (Porta 5173):
+
+```powershell
 cd frontend
 npm run dev
-
-# 4. Acessar no Navegador:
-# - Frontend: http://localhost:5173
-# - Swagger UI: http://127.0.0.1:8000/docs
-
 ```
+
+4. Acessar no Navegador:
+
+- **Frontend:** `http://localhost:5173`
+- **Swagger UI Live:** `http://localhost:5173/docs` (ou `http://127.0.0.1:8000/docs`)
 
 ---
 

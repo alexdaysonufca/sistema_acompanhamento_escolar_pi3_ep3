@@ -187,10 +187,10 @@ Cinco Modos de Visualização e Operação:
 6.1 MODO DESENVOLVEDOR (PAINEL DE ENGENHARIA RBAC)
 -------------------------------------------------------------------------------
 O frontend disponibiliza um perfil exclusivo para avaliação e auditoria técnica:
-- Documentação da API: Visualizador integrado e link para Swagger UI (http://127.0.0.1:8000/docs) com ThreadingHTTPServer.
+- Documentação da API: Visualizador integrado e link para Swagger UI (/docs e http://127.0.0.1:8000/docs) com ThreadingHTTPServer.
+- Documentação Técnica: Leitor para visualização na íntegra de todos os documentos técnicos (.md).
 - Integrantes: Apresentação acadêmica dos estudantes da Universidade Federal do Cariri (UFCA).
 - Sobre: Visão arquitetural, princípios de Clean Architecture, 79 testes no Pytest e extensão social.
-- Documentação Técnica: Leitor para visualização na íntegra de todos os documentos técnicos (.md).
 
 -------------------------------------------------------------------------------
 7. VALIDAÇÃO DA QUALIDADE E SUÍTE DE TESTES (PYTEST)

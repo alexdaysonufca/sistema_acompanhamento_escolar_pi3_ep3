@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import mermaid from "mermaid";
 import {
   Bell, User, ChevronDown, X, AlertTriangle, CheckCircle,
   FileText, BookOpen, Calendar, MessageSquare, Settings, HelpCircle,
@@ -179,9 +180,9 @@ function Header({
       : activeRole === "DEVELOPER"
       ? [
           { key: "swagger_api", label: "Documentação da API" },
+          { key: "docs_md", label: "Documentação Técnica" },
           { key: "integrantes", label: "Integrantes" },
           { key: "sobre", label: "Sobre" },
-          { key: "docs_md", label: "Documentação Técnica" },
         ]
       : [
           { key: "dashboard", label: "Início" },
@@ -213,7 +214,7 @@ function Header({
               activeRole === "TEACHER"
                 ? "professor"
                 : activeRole === "DEVELOPER"
-                ? "integrantes"
+                ? "swagger_api"
                 : "dashboard"
             );
             setMobileMenuOpen(false);
@@ -5090,7 +5091,7 @@ function SwaggerApiScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) {
           </div>
 
           <a
-            href="http://127.0.0.1:8000/docs"
+            href="/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="px-4 py-2 bg-[#1B4F8A] hover:bg-[#153D6B] text-white font-bold text-sm rounded-lg shadow-sm flex items-center gap-2 transition-all"
@@ -5102,7 +5103,7 @@ function SwaggerApiScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) {
 
         <div className="w-full h-[700px] border border-[#CBD5E1] rounded-xl overflow-hidden shadow-inner bg-[#FAFBFD]">
           <iframe
-            src="http://127.0.0.1:8000/docs"
+            src="/docs"
             title="Swagger UI — TrAcEs API RESTful"
             className="w-full h-full border-none"
           />
@@ -5367,10 +5368,192 @@ function parseInlineMarkdown(text: string): React.ReactNode {
   });
 }
 
+mermaid.initialize({
+  startOnLoad: false,
+  theme: "default",
+  securityLevel: "loose",
+  fontFamily: "Inter, system-ui, sans-serif",
+  themeVariables: {
+    primaryColor: "#EBF3FC",
+    primaryTextColor: "#1A2332",
+    primaryBorderColor: "#1B4F8A",
+    lineColor: "#1B4F8A",
+    secondaryColor: "#F8FAFC",
+    tertiaryColor: "#FFFFFF",
+  },
+});
+
+function MermaidDiagram({ chart, id }: { chart: string; id: string }) {
+  const [svg, setSvg] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const renderChart = async () => {
+      try {
+        const cleanChart = chart.trim();
+        if (!cleanChart) return;
+        const uniqueId = `mermaid-${id.replace(/[^a-zA-Z0-9_-]/g, "_")}-${Math.random().toString(36).substring(2, 7)}`;
+        const { svg: renderedSvg } = await mermaid.render(uniqueId, cleanChart);
+        if (isMounted) {
+          setSvg(renderedSvg);
+          setError(null);
+        }
+      } catch (err: any) {
+        if (isMounted) {
+          setError(err?.message || "Falha ao renderizar diagrama");
+        }
+      }
+    };
+
+    renderChart();
+    return () => {
+      isMounted = false;
+    };
+  }, [chart, id]);
+
+  if (error) {
+    return (
+      <div className="my-4 p-4 bg-[#FAFBFD] border border-amber-300 rounded-xl">
+        <p className="text-xs font-semibold text-amber-800 mb-2">Diagrama Mermaid (Código-Fonte):</p>
+        <pre className="bg-[#1A2332] text-[#F8FAFC] p-3 rounded-lg font-mono text-xs overflow-x-auto">
+          <code>{chart}</code>
+        </pre>
+      </div>
+    );
+  }
+
+  if (!svg) {
+    return (
+      <div className="my-6 p-6 bg-[#FAFBFD] border border-[#CBD5E1] rounded-xl flex items-center justify-center text-xs text-[#6B7A8D] animate-pulse">
+        Renderizando diagrama Mermaid...
+      </div>
+    );
+  }
+
+  return (
+    <div className="my-6 p-4 sm:p-6 bg-white border border-[#CBD5E1] rounded-xl shadow-xs overflow-x-auto flex flex-col items-center">
+      <div className="w-full flex items-center justify-between text-xs text-[#6B7A8D] font-semibold mb-3 border-b border-[#EEF2F7] pb-2">
+        <span className="flex items-center gap-1.5 text-[#1B4F8A]">
+          <Code size={14} /> Diagrama Mermaid Renderizado
+        </span>
+        <span className="text-[11px] bg-[#EEF2F7] text-[#1A2332] px-2 py-0.5 rounded font-mono">interativo</span>
+      </div>
+      <div
+        className="w-full flex justify-center [&>svg]:max-w-full [&>svg]:h-auto [&>svg]:mx-auto"
+        dangerouslySetInnerHTML={{ __html: svg }}
+      />
+    </div>
+  );
+}
+
+function highlightJson(jsonStr: string): React.ReactNode {
+  const tokenRegex = /("(?:\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?|[{}[\],:])/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = tokenRegex.exec(jsonStr)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(jsonStr.substring(lastIndex, match.index));
+    }
+    const token = match[0];
+    const key = `tok-${match.index}`;
+
+    if (token.startsWith('"')) {
+      if (token.endsWith(':')) {
+        const keyText = token.slice(0, -1);
+        parts.push(
+          <span key={key} className="text-[#38BDF8] font-semibold">
+            {keyText}
+          </span>
+        );
+        parts.push(<span key={`${key}-colon`} className="text-[#94A3B8]">:</span>);
+      } else {
+        parts.push(
+          <span key={key} className="text-[#4ADE80]">
+            {token}
+          </span>
+        );
+      }
+    } else if (token === "true" || token === "false") {
+      parts.push(
+        <span key={key} className="text-[#F472B6] font-semibold">
+          {token}
+        </span>
+      );
+    } else if (token === "null") {
+      parts.push(
+        <span key={key} className="text-[#A78BFA] italic">
+          {token}
+        </span>
+      );
+    } else if (/^-?\d/.test(token)) {
+      parts.push(
+        <span key={key} className="text-[#FBBF24]">
+          {token}
+        </span>
+      );
+    } else {
+      parts.push(
+        <span key={key} className="text-[#CBD5E1]">
+          {token}
+        </span>
+      );
+    }
+    lastIndex = tokenRegex.lastIndex;
+  }
+
+  if (lastIndex < jsonStr.length) {
+    parts.push(jsonStr.substring(lastIndex));
+  }
+
+  return parts;
+}
+
+function CodeBlockBox({ code, language }: { code: string; language: string }) {
+  const [copied, setCopied] = useState(false);
+  const lang = (language || "code").toLowerCase();
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const isJson = lang === "json" || (lang === "" && code.trim().startsWith("{") && code.trim().endsWith("}"));
+
+  return (
+    <div className="my-4 rounded-xl border border-[#334155] bg-[#1A2332] overflow-hidden shadow-sm">
+      <div className="flex items-center justify-between px-4 py-2 bg-[#0F172A] border-b border-[#334155] text-xs text-[#94A3B8]">
+        <div className="flex items-center gap-2">
+          <Code size={14} className="text-[#38BDF8]" />
+          <span className="font-mono uppercase font-bold text-[11px] tracking-wider text-[#38BDF8]">
+            {isJson ? "JSON" : lang.toUpperCase()}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#1E293B] hover:bg-[#334155] active:scale-95 text-white text-[11px] font-semibold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          title="Copiar conteúdo do bloco"
+        >
+          {copied ? <Check size={12} className="text-green-400" /> : <Printer size={12} />}
+          {copied ? "Copiado!" : isJson ? "Copiar Payload" : "Copiar Código"}
+        </button>
+      </div>
+      <pre className="p-4 text-xs font-mono text-[#F8FAFC] overflow-x-auto whitespace-pre leading-relaxed font-normal selection:bg-blue-600 selection:text-white">
+        <code>{isJson ? highlightJson(code) : code}</code>
+      </pre>
+    </div>
+  );
+}
+
 function SimpleMarkdownViewer({ content }: { content: string }) {
   const lines = content.split("\n");
   const elements: React.ReactNode[] = [];
   let inCodeBlock = false;
+  let codeBlockLang = "";
   let codeBuffer: string[] = [];
   let tableBuffer: string[] = [];
 
@@ -5413,18 +5596,30 @@ function SimpleMarkdownViewer({ content }: { content: string }) {
   };
 
   lines.forEach((line, idx) => {
-    if (line.startsWith("```")) {
+    const trimmedLine = line.trim();
+    if (trimmedLine.startsWith("```")) {
       if (inCodeBlock) {
-        elements.push(
-          <pre key={`code-${idx}`} className="bg-[#1A2332] text-[#F8FAFC] p-4 rounded-xl font-mono text-xs overflow-x-auto my-4 shadow-sm">
-            <code>{codeBuffer.join("\n")}</code>
-          </pre>
-        );
+        const rawCode = codeBuffer.join("\n");
+        if (codeBlockLang === "mermaid") {
+          elements.push(
+            <MermaidDiagram key={`mermaid-${idx}`} chart={rawCode} id={`diag-${idx}`} />
+          );
+        } else {
+          elements.push(
+            <CodeBlockBox
+              key={`code-${idx}`}
+              code={rawCode}
+              language={codeBlockLang || (rawCode.trim().startsWith("{") || rawCode.trim().startsWith("[") ? "json" : "code")}
+            />
+          );
+        }
         codeBuffer = [];
         inCodeBlock = false;
+        codeBlockLang = "";
       } else {
         flushTable();
         inCodeBlock = true;
+        codeBlockLang = trimmedLine.replace(/^`+/, "").trim().toLowerCase();
       }
       return;
     }
@@ -5441,21 +5636,42 @@ function SimpleMarkdownViewer({ content }: { content: string }) {
       flushTable();
     }
 
-    if (line.startsWith("# ")) {
-      elements.push(<h1 key={idx} className="text-2xl font-bold text-[#1A2332] font-['Source_Serif_4'] mt-6 mb-3 border-b border-[#CBD5E1] pb-2">{parseInlineMarkdown(line.replace("# ", ""))}</h1>);
-    } else if (line.startsWith("## ")) {
-      elements.push(<h2 key={idx} className="text-xl font-bold text-[#1A2332] font-['Source_Serif_4'] mt-5 mb-2 border-b border-[#EEF2F7] pb-1.5">{parseInlineMarkdown(line.replace("## ", ""))}</h2>);
-    } else if (line.startsWith("### ")) {
-      elements.push(<h3 key={idx} className="text-lg font-bold text-[#1B4F8A] font-['Source_Serif_4'] mt-4 mb-2">{parseInlineMarkdown(line.replace("### ", ""))}</h3>);
-    } else if (line.startsWith("#### ")) {
-      elements.push(<h4 key={idx} className="text-base font-bold text-[#1A2332] mt-3 mb-1">{parseInlineMarkdown(line.replace("#### ", ""))}</h4>);
-    } else if (line.startsWith("- ")) {
-      elements.push(<li key={idx} className="text-xs sm:text-sm text-[#4A5568] ml-4 list-disc my-0.5">{parseInlineMarkdown(line.replace("- ", ""))}</li>);
-    } else if (line.startsWith("1. ") || line.startsWith("2. ") || line.startsWith("3. ") || line.startsWith("4. ") || line.startsWith("5. ")) {
-      elements.push(<li key={idx} className="text-xs sm:text-sm text-[#4A5568] ml-4 list-decimal my-0.5">{parseInlineMarkdown(line.replace(/^\d+\.\s+/, ""))}</li>);
-    } else if (line.trim() === "---") {
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith("# ")) {
+      elements.push(<h1 key={idx} className="text-2xl font-bold text-[#1A2332] font-['Source_Serif_4'] mt-6 mb-3 border-b border-[#CBD5E1] pb-2">{parseInlineMarkdown(trimmed.replace(/^#\s+/, ""))}</h1>);
+    } else if (trimmed.startsWith("## ")) {
+      elements.push(<h2 key={idx} className="text-xl font-bold text-[#1A2332] font-['Source_Serif_4'] mt-5 mb-2 border-b border-[#EEF2F7] pb-1.5">{parseInlineMarkdown(trimmed.replace(/^##\s+/, ""))}</h2>);
+    } else if (trimmed.startsWith("### ")) {
+      elements.push(<h3 key={idx} className="text-lg font-bold text-[#1B4F8A] font-['Source_Serif_4'] mt-4 mb-2">{parseInlineMarkdown(trimmed.replace(/^###\s+/, ""))}</h3>);
+    } else if (trimmed.startsWith("#### ")) {
+      elements.push(<h4 key={idx} className="text-base font-bold text-[#1A2332] mt-3 mb-1">{parseInlineMarkdown(trimmed.replace(/^####\s+/, ""))}</h4>);
+    } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+      elements.push(
+        <div key={idx} className="flex items-start gap-2 ml-4 my-1 text-xs sm:text-sm text-[#4A5568]">
+          <span className="text-[#1B4F8A] font-bold select-none">•</span>
+          <div className="flex-1 leading-relaxed">{parseInlineMarkdown(trimmed.substring(2))}</div>
+        </div>
+      );
+    } else if (/^\d+\.\s+/.test(trimmed)) {
+      const match = trimmed.match(/^(\d+)\.\s+(.*)$/);
+      const num = match ? match[1] : "1";
+      const text = match ? match[2] : trimmed;
+      elements.push(
+        <div key={idx} className="flex items-start gap-2 ml-4 my-1 text-xs sm:text-sm text-[#4A5568]">
+          <span className="font-bold text-[#1B4F8A] select-none min-w-[1.2rem]">{num}.</span>
+          <div className="flex-1 leading-relaxed">{parseInlineMarkdown(text)}</div>
+        </div>
+      );
+    } else if (trimmed.startsWith("> ")) {
+      elements.push(
+        <blockquote key={idx} className="border-l-4 border-[#FEF08A] bg-[#FEFCE8] p-3 my-2 text-xs sm:text-sm text-[#713F12] rounded-r-lg">
+          {parseInlineMarkdown(trimmed.replace(/^>\s*/, ""))}
+        </blockquote>
+      );
+    } else if (trimmed === "---") {
       elements.push(<hr key={idx} className="my-6 border-[#CBD5E1]" />);
-    } else if (line.trim().length > 0) {
+    } else if (trimmed.length > 0) {
       elements.push(<p key={idx} className="text-xs sm:text-sm text-[#4A5568] leading-relaxed my-2">{parseInlineMarkdown(line)}</p>);
     }
   });
@@ -5559,7 +5775,11 @@ function DocsMarkdownScreen({ onNavigate }: { onNavigate: (s: Screen) => void })
             </span>
           </div>
 
-          <SimpleMarkdownViewer content={docContent} />
+          {selectedDocKey.endsWith(".txt") ? (
+            <CodeBlockBox code={docContent} language="text" />
+          ) : (
+            <SimpleMarkdownViewer content={docContent} />
+          )}
         </div>
       </div>
     </main>
@@ -5679,9 +5899,9 @@ export default function App() {
       targetScreen = "dashboard";
     } else if (
       activeRole === "DEVELOPER" &&
-      !["swagger_api", "integrantes", "sobre", "docs_md"].includes(s)
+      !["swagger_api", "docs_md", "integrantes", "sobre"].includes(s)
     ) {
-      targetScreen = "integrantes";
+      targetScreen = "swagger_api";
     }
     setScreen(targetScreen);
     setAnnouncement(screenTitles[targetScreen]);
@@ -5705,7 +5925,7 @@ export default function App() {
     if (nextRole === "TEACHER") {
       targetScreen = "professor";
     } else if (nextRole === "DEVELOPER") {
-      targetScreen = "integrantes";
+      targetScreen = "swagger_api";
     } else {
       targetScreen = "dashboard";
     }
@@ -5726,9 +5946,9 @@ export default function App() {
       setScreen("dashboard");
     } else if (
       activeRole === "DEVELOPER" &&
-      !["swagger_api", "integrantes", "sobre", "docs_md"].includes(screen)
+      !["swagger_api", "docs_md", "integrantes", "sobre"].includes(screen)
     ) {
-      setScreen("integrantes");
+      setScreen("swagger_api");
     }
   }, [activeRole, screen]);
 

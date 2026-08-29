@@ -20,7 +20,7 @@ O **TrAcEs (Trilha de Acompanhamento Escolar)** é uma aplicação Web de alta f
 - **Linguagens e Tecnologias:** Python 3.12, TypeScript 5, React 18, Vite 6, Tailwind CSS v4, SQLite 3.
 - **Padrões Arquiteturais:** Clean Architecture em 4 Camadas (Backend), MVC, SPA (Frontend), Repository Pattern, RESTful API com OpenAPI 3.0.3.
 - **Suíte de Testes:** 79 testes automatizados no `pytest` (100% de sucesso).
-- **Documentação de API:** Swagger UI interativo live em `http://127.0.0.1:8000/docs` cobrindo 18 endpoints RESTful.
+- **Documentação de API:** Swagger UI interativo live em `http://localhost:5173/docs` (ou direto em `:8000/docs`) cobrindo 18 endpoints RESTful.
 
 ---
 
@@ -84,7 +84,7 @@ pi_3_ep_3_-_v_1/
 ├── frontend/                                  # [VIEW] FRONTEND SPA REACT 18
 │   ├── index.html                             # Entrypoint HTML5 semântico com meta tags e fontes
 │   ├── package.json                           # Dependências (React 18, Vite 6, Tailwind v4, Radix, Lucide)
-│   ├── vite.config.ts                         # Configuração do Vite com proxy reverso /api -> :8000
+│   ├── vite.config.ts                         # Configuração do Vite com host: true e proxy (/api, /docs, /openapi.json)
 │   ├── postcss.config.mjs                     # Processamento de estilos Tailwind CSS
 │   ├── default_shadcn_theme.css               # Variáveis e temas do Shadcn UI
 │   ├── ATTRIBUTIONS.md                        # Licenças e atribuições de ativos
