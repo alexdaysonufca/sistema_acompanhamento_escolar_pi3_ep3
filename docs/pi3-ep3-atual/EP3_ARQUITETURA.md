@@ -220,19 +220,19 @@ graph LR
 
 ```mermaid
 graph TD
-    DOCENTE[Professor / Área do Docente] -->|1. Lança notas ou edita avaliação| SPA[SPA React]
-    SPA -->|2. PUT /api/teacher/assessments/{id} ou POST /bulk| REST[API REST Python]
-    REST -->|3. Valida escopo e recalcula médias| APP[ServicosDoAluno]
-    APP -->|4. Executa UPDATE / INSERT transacional| SQL[(SQLite 3 Database)]
-    SQL -->|5. Confirma persistência ACID| REST
-    REST -->|6. Retorna status 200 OK + payload JSON| SPA
-    SPA -->|7. Exibe Toast de confirmação visual| DOCENTE
+    DOCENTE[Professor / Área do Docente] -->|"1. Lança notas ou edita avaliação"| SPA[SPA React]
+    SPA -->|"2. PUT /api/teacher/assessments/{id} ou POST /bulk"| REST[API REST Python]
+    REST -->|"3. Valida escopo e recalcula médias"| APP[ServicosDoAluno]
+    APP -->|"4. Executa UPDATE / INSERT transacional"| SQL[(SQLite 3 Database)]
+    SQL -->|"5. Confirma persistência ACID"| REST
+    REST -->|"6. Retorna status 200 OK + payload JSON"| SPA
+    SPA -->|"7. Exibe Toast de confirmação visual"| DOCENTE
     
-    RESP[Responsável Legal] -->|8. Acessa Boletim ou Notas| SPA
-    SPA -->|9. GET /api/students/{id}/report-card| REST
-    REST -->|10. Consulta dados atualizados| SQL
-    SQL -->|11. Retorna notas e médias recalculadas| REST
-    REST -->|12. Renderiza visualização instantânea| RESP
+    RESP[Responsável Legal] -->|"8. Acessa Boletim ou Notas"| SPA
+    SPA -->|"9. GET /api/students/{id}/report-card"| REST
+    REST -->|"10. Consulta dados atualizados"| SQL
+    SQL -->|"11. Retorna notas e médias recalculadas"| REST
+    REST -->|"12. Renderiza visualização instantânea"| RESP
 ```
 
 ### 3.5 Diagrama de Sequência: Edição de Avaliação e Recálculo
