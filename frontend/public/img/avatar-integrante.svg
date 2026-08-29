@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="auto" role="img" aria-label="Avatar Integrante - Equipe Pedagógica">
+  <defs>
+    <linearGradient id="integrante-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#5B21B6"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#integrante-bg)"/>
+  <!-- Head -->
+  <circle cx="60" cy="46" r="22" fill="#FDE047"/>
+  <!-- Hair -->
+  <path d="M 40 40 C 40 26, 80 26, 80 40 C 75 32, 45 32, 40 40 Z" fill="#4B5563"/>
+  <!-- Body/Shirt -->
+  <path d="M 24 102 C 24 76, 96 76, 96 102 Z" fill="#DDD6FE"/>
+  <!-- Collar -->
+  <path d="M 50 76 L 60 88 L 70 76 Z" fill="#6D28D9"/>
+</svg>

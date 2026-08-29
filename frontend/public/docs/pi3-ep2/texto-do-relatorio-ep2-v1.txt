@@ -1,0 +1,566 @@
+ 
+Análise e Desenvolvimento de Sistemas (ADS)
+Centro de Educação a Distância (CEAD)
+
+PROJETO INTEGRADO III [ADS0038]
+Prof. Luís Fabrício de Freitas Souza
+fabricio.freitas@ufca.edu.br
+
+Entregável Parcial 2 (EP2) - Relatório
+
+
+Nome completo: Antonio Alex Dayson Tomaz
+Matrícula: 2023009790
+
+Nome completo: Maria Alexsandra Tomaz
+Matrícula: 2023018799
+Link dos Diagramas Arquiteturais do Sistema no Figma
+https://wind-matte-61002290.figma.site
+Link do repositório no GitHub
+
+Link do vídeo explicativo:
+
+Link do relatório: 
+https://docs.google.com/document/d/1MHQd2gzRY1bHv8K7HvBQQ1qLwO9VkSCA/edit?usp=drive_link&ouid=105113364323104630867&rtpof=true&sd=true
+
+
+
+1. Visão Geral da Arquitetura
+1.1 Compreensão e Atendimento aos Requisitos do Entregável
+A equipe compreendeu o entregável do Entregável Parcial 2 (EP2) não apenas como uma listagem formal de tecnologias, mas como a construção de um verdadeiro Manual de Engenharia de Software. O projeto TrAcEs (Trilha de Acompanhamento Escolar) foi estruturado para conectar os artefatos de usabilidade e acessibilidade desenvolvidos na prototipagem de alta fidelidade (Figma / Web SPA) à arquitetura lógica do servidor backend. 
+O atendimento aos requisitos deu-se pela estrita separação entre a camada visual de apresentação e as regras de negócio acadêmicas, garantindo que o modelo arquitetural reflita os princípios da Clean Architecture, da orientação a objetos rigorosa, da acessibilidade conforme as diretrizes internacionais WCAG 2.1 AA e do atendimento às 10 Heurísticas de Nielsen.
++-----------------------------------------------------------------------+
+|                         SISTEMA TRACES (MVP)                          |
++-----------------------------------+-----------------------------------+
+|       FRONTEND (APRESENTAÇÃO)     |        BACKEND (APLICAÇÃO)        |
+|  - React 18 + Vite                |  - Python 3.10+ (Clean Arch.)     |
+|  - Shadcn UI + TailwindCSS        |  - Domain / Application / Infra   |
+|  - Acessibilidade WCAG 2.1 AA     |  - Banco de Dados SQLite 3        |
++-----------------------------------+-----------------------------------+
+|               COMUNICAÇÃO: APIs REST (HTTP / JSON)                    |
++-----------------------------------------------------------------------+
+
+1.2 Contextualização do Problema e Comunicação Escolar
+O acompanhamento pedagógico e a comunicação entre o ecossistema escolar e os núcleos familiares no Brasil — especialmente em instituições públicas de pequeno porte, projetos sociais e escolas comunitárias — enfrentam gargalos críticos: 
+•	Descentralização e Perda de Dados: O uso recorrente de cadernetas de papel ou planilhas locais isoladas resulta em extravio de histórico, erros no cálculo de médias pedagógicas e morosidade na consolidação de boletins bimestrais. 
+•	Detecção Tardia do Risco de Evasão Escolar: A ausência de alertas em tempo real sobre quedas na assiduidade (frequência abaixo do limite legal de 75%) impede ações preventivas imediatas do corpo docente ou da assistência social. 
+•	Exclusão Digital dos Responsáveis: Plataformas corporativas convencionais possuem interfaces densas, pouco intuitivas e inacessíveis para familiares com baixo letramento digital ou com alguma condição de deficiência.
+•	O TrAcEs resolve esse cenário ao disponibilizar uma plataforma web centralizada, transparente e inclusiva, automatizando o processamento de dados escolares e entregando visualizações acessíveis e imediatas. 
+
+
+1.3 Propósito e Objetivos do MVP Web
+O objetivo primordial do Minimum Viable Product (MVP) é validar a viabilidade técnica, a sustentabilidade da engenharia e a usabilidade prática da solução. O MVP foca em duas pontas fundamentais do ciclo acadêmico: 
+a)	Eficiência Operacional do Docente: Permitir o lançamento rápido e seguro em lote de notas e frequências diárias, contando com validações de dados no frontend e no backend antes da persistência definitiva. 
+b)	Consumo Acessível pelo Responsável Legal: Oferecer um painel simplificado que consolide médias bimestrais, extrato de presença tátil/visual e avisos institucionais de forma instantânea e totalmente adaptável a recursos de acessibilidade. 
+1.4 Mapeamento de Usuários (Responsáveis, Docentes, Secretaria)
+O sistema foi projetado para atender a três perfis operacionais bem delimitados:
++-----------------------------------------------------------------------+
+|                         PERFIS DE USUÁRIOS                            |
++-----------------------------------------------------------------------+
+| 1. RESPONSÁVEIS LEGAIS (PAIS / TUTORES)                               |
+|    - Perfil: Consumo de dados acadêmicos e acompanhamento diário.     |
+|    - Demanda: Interface limpa, suporte a leitores de tela, alto       |
+|      contraste e aumento de fonte (baixo letramento digital).         |
++-----------------------------------------------------------------------+
+| 2. CORPO DOCENTE (PROFESSORES)                                        |
+|    - Perfil: Operação de escrita e registros acadêmicos.              |
+|    - Demanda: Grids operacionais para entrada em lote de notas e      |
+|      frequências, com prevenção ativa de erros e feedback imediato.   |
++-----------------------------------------------------------------------+
+| 3. SECRETARIA E ADMINISTRAÇÃO                                         |
+|    - Perfil: Suporte e parametrização do ecossistema escolar.         |
+|    - Demanda: Gestão de cadastros (alunos, professores, turmas) e     |
+|      configuração dos vínculos lógicos (estudante-responsável).       |
++-----------------------------------------------------------------------+
+
+1.5 Organização Geral da Aplicação Desacoplada (Cliente-Servidor)
+A aplicação adota o modelo de arquitetura Cliente-Servidor desacoplado: 
+•	Frontend (Camada de Apresentação): Uma Single Page Application (SPA) desenvolvida em React 18 com Vite, estilizada com Shadcn UI e TailwindCSS. É responsável pela renderização local no navegador do usuário, gerenciamento do estado visual e execução de componentes de acessibilidade. 
+•	Backend (Camada de Aplicação e Negócio): Estruturado em Python 3.10+ sob os preceitos da Clean Architecture (Domain, Application e Infrastructure). Concentra o processamento das regras acadêmicas (cálculo de médias, validação de limites de presença e regras de aprovação). 
+•	Persistência de Dados: Banco de dados relacional SQLite 3 embutido, gerenciado pela camada de infraestrutura via o padrão Repository. 
+•	Comunicação: Conexão sem estado (stateless) via APIs RESTful, utilizando requisições HTTP (GET, POST) e cargas de dados padronizadas em JSON. 
+2. Modelo Arquitetural do Sistema
+2.1 Estrutura em Camadas (Frontend SPA, Backend Python Clean Arch, SQLite 3)
+A divisão arquitetural do TrAcEs (Trilha de Acompanhamento Escolar) foi projetada sob o princípio fundamental da Separação de Preocupações (Separation of Concerns - SoC), assegurando baixo acoplamento entre a interface visual de interação e as regras acadêmicas transacionais. A aplicação está fisicamente e logicamente estruturada em três grandes blocos de camadas:
++-----------------------------------------------------------------------------------+
+|                        CAMADA DE APRESENTAÇÃO (FRONTEND)                          |
+|                       React 18 + Vite + Shadcn UI (SPA)                           |
+|       - Gerenciamento de Estado Visual, Roteamento Client-Side e WCAG             |
++-----------------------------------------------------------------------------------+
+│  ▲
+Requisições REST (HTTP)    │  │ Payloads JSON
+▼  │
++-----------------------------------------------------------------------------------+
+|                     CAMADA DE APLICAÇÃO E NEGÓCIO (BACKEND)                       |
+|                          Python 3.10+ (Clean Architecture)                        |
+|                                                                                   |
+|  ┌─────────────────────────────────────────────────────────────────────────────┐  |
+|  │ Camada de Aplicação (services.py): Casos de Uso (ServicosDoAluno/Secretaria)│  |
+|  └─────────────────────────────────────────────────────────────────────────────┘  |
+|                                        ▲                                          |
+|                                        │ Injeção de Dependência                   |
+|  ┌─────────────────────────────────────────────────────────────────────────────┐  |
+|  │ Camada de Domínio (models.py): Entidades, Enums e Validações de Negócio     │  |
+|  └─────────────────────────────────────────────────────────────────────────────┘  |
+|                                        ▲                                          |
+|                                        │ Inversão de Dependência                  |
+|  ┌─────────────────────────────────────────────────────────────────────────────┐  |
+|  │ Camada de Infraestrutura (database.py): Drivers SQL e Repositórios          │  |
+|  └─────────────────────────────────────────────────────────────────────────────┘  |
++-----------------------------------------------------------------------------------+
+│  ▲
+Operações CRUD (SQL)    │  │ Tuplas / Datasets
+▼  │
++-----------------------------------------------------------------------------------+
+|                        CAMADA DE PERSISTÊNCIA (BANCO DE DADOS)                    |
+|                             SQLite 3 Relacional Local                             |
+|          - Armazenamento Físico Íntegro de Tabelas e Chaves Estrangeiras          |
++-----------------------------------------------------------------------------------+
+
+a) Frontend (Cliente — Camada de Apresentação)
+•	Tecnologias: React 18, Vite, Shadcn UI e TailwindCSS. 
+•	Função e Atuação: Funciona como uma Single Page Application (SPA) executada nativamente no navegador do cliente. Processa e renderiza os componentes de interface localmente, gerencia a reatividade de telas e implementa os controles acessíveis de magnificação de fonte, alto contraste e navegabilidade por teclado. Suas interações disparam requisições assíncronas para a API do backend sem necessitar do recarregamento completo da página. 
+b) Backend (Servidor — Camada de Aplicação e Regras de Negócio)
+•	Tecnologia: Python 3.10+. 
+•	Estruturação por Clean Architecture: O servidor interno divide-se rigidamente em três subcamadas com controle estrito da direção de dependências (que correm exclusivamente de fora para dentro): 
+o	Camada de Domínio (src/domain/models.py): Contém o núcleo puro das regras de negócio acadêmicas. Define as entidades fundamentais (Student, Teacher, Parent, Classroom, Grade, Attendance), enums operacionais e validações de consistência interna das entidades. É uma camada isolada, livre de frameworks externos ou dependências diretas de banco de dados. 
+o	Camada de Aplicação (src/application/services.py): Encapsula os casos de uso e serviços da escola (ServicosDoAluno, ServicosSecretaria). Orquestra o cálculo de médias ponderadas bimestrais, consolidação do boletim acadêmico, apuração da taxa de assiduidade e validações transacionais. 
+o	Camada de Infraestrutura (src/infrastructure/database.py): Gerencia a persistência concreta dos dados. Contém as implementações dos repositórios (StudentRepository, GradeRepository, AttendanceRepository, etc.) e os drivers de conexão SQL. 
+c) Banco de Dados (Camada de Persistência)
+•	Tecnologia: SQLite 3. 
+•	Função e Atuação: Banco de dados relacional embutido responsável por armazenar de forma íntegra e transacional o histórico escolar (traces.db). Garante consistência por meio de chaves primárias, chaves estrangeiras explícitas e restrições físicas de verificação. 
+2.2 Componentes da Aplicação (Autenticação, Secretaria, Docente, Responsável)
+O sistema TrAcEs organiza-se em quatro módulos lógicos principais. A tabela a seguir detalha a função, os mecanismos de comunicação e a importância estratégica de cada um no ecossistema: 
+Componente Lógico	Função do Módulo	Mecanismos de Comunicação	Importância no Sistema
+1. Módulo de Autenticação e Controle de Acesso	Autentica as credenciais dos usuários (Docente, Responsável, Secretaria) e define o escopo de permissões (RBAC). 	Intercepta requisições HTTP no backend enviando tokens de sessão (JWT) e injetando o contexto do perfil do usuário. 	Impede o acesso indevido a dados de estudantes e restringe os direitos de gravação e alteração acadêmica exclusivamente ao corpo docente. 
+2. Módulo da Secretaria (Administração de Vínculos)	Gerencia o cadastro inicial de alunos, professores, turmas e configura o relacionamento relacional entre responsáveis e dependentes. 	Comunica-se diretamente com os serviços da camada de aplicação (ServicosSecretaria) enviando comandos de persistência aos repositórios. 	Constrói a base de dados estruturada. Sem a amarração do vínculo socioafetivo, o painel do responsável não consegue listar os dependentes no login. 
+3. Módulo do Docente (Operações de Escrita)	Prover grids operacionais para lançamento em lote de notas bimestrais e realização da chamada diária de presença. 	Executa validações em tempo real no cliente React antes de submeter payloads JSON de escrita em lote para a API acadêmica do backend. 	Fonte primária de dados dinâmicos do sistema. Alimenta as tabelas de histórico e dispara as notificações visuais consumidas pelas famílias. 
+4. Módulo do Responsável (Painel de Acompanhamento)	Centraliza o consumo e consulta analítica dos dados acadêmicos dos dependentes vinculados ao responsável. 	Envia requisições HTTP GET de leitura para a API (ServicosDoAluno), renderizando submódulos modulares em SPA (Boletim, Calendário, Avisos). 	Ponto focal do componente social e extensionista. Oferece transparência pedagógica e permite ação preventiva contra a evasão escolar. 
+
+2.3 Tecnologias Utilizadas e Justificativas Técnicas
+A escolha do ecossistema tecnológico do TrAcEs alinhou desempenho local, manutenibilidade técnica e capacidade de execução inclusiva em equipamentos de baixo desempenho.
++-----------------------------------------------------------------------------------+
+|                        PILHA TECNOLÓGICA DO PROJETO TRACES                        |
++---------------------+-------------------+-----------------------------------------+
+| TECNOLOGIA          | CAMADA / PAPEL    | JUSTIFICATIVA TÉCNICA E VANTAGENS       |
++---------------------+-------------------+-----------------------------------------+
+| Python 3.10+        | Backend Server    | Tipagem precisa (Decimal), isolamento   |
+      |                     |                   | natural de camadas e POO robuso.        |
++---------------------+-------------------+-----------------------------------------+
+      | React 18            | Frontend Library  | Componentização reativa, re-renderização|
+      |                     |                   | otimizada em SPA sem reload.            |
++---------------------+-------------------+-----------------------------------------+
+      | Vite                | Frontend Bundler  | Servidor de dev veloz e tempo de build  |
+      |                     |                   | otimizado com HMR instantâneo.          |
++---------------------+-------------------+-----------------------------------------+
+      | Shadcn UI           |UI Component Library| Componentes headless baseados em Radix;|
+      |                     |                   | suporte nativo a WAI-ARIA/WCAG.         |
++---------------------+-------------------+-----------------------------------------+
+| TailwindCSS         | Utility-First CSS | Customização de temas globais (alto     |
+      |                     |                   | contraste e tamanhos rem/em).           |
++---------------------+-------------------+-----------------------------------------+
+| SQLite 3            | Embedded Database | Engine relacional leve (single file),   |
+      |                     |                   | zero configuração de servidor.          |
++---------------------+-------------------+-----------------------------------------+
+Justificativas e Vantagens Detalhadas
+a)	Python 3.10+ (Backend):
+o	Por que escolheu: Oferece sintaxe limpa, facilidade de organização orientada a objetos e excelente isolamento para a Clean Architecture. 
+o	Vantagem: Suporte nativo ao tipo numérico Decimal, fundamental para eliminar erros de ponto flutuante durante o cálculo e arredondamento de médias pedagógicas ponderadas.
+b)	React 18 + Vite (Frontend SPA):
+o	Por que escolheu: O React permite criar interfaces baseadas em componentes desacoplados e reativos, enquanto o Vite substitui bundlers legados com tempo de inicialização imediato.
+o	Vantagem: Transições de tela instantâneas sem recarregar a página, retendo o estado de acessibilidade ativado pelo usuário (ex: zoom ou tema ativado) durante toda a navegação.
+c)	Shadcn UI + TailwindCSS (Design System e Estilização):
+o	Por que escolheu: Fornecem primitivos de interface headless altamente acessíveis construídos sobre as especificações do Radix UI.
+o	Vantagem: Cumprimento nativo de WAI-ARIA (gerenciamento de foco por teclado, compatibilidade com leitores de tela) e facilidade para chavear classes utilitárias de alto contraste.
+d)	SQLite 3 (Banco de Dados):
+o	Por que escolheu: Motor SQL relacional embarcado e sem necessidade de gerenciadores de serviço ativos rodando em segundo plano.
+o	Vantagem: Consolidação de todo o histórico escolar do MVP em um único arquivo portátil (traces.db), reduzindo a pegada de memória RAM para execução em máquinas com recursos limitados. 
+2.4	Manual de Engenharia: Contrato de Integração da API (Frontend ↔ Backend)
+Para conectar o Frontend em React SPA (com Shadcn UI) e o Backend em Python (estruturado sob a Clean Architecture), estabeleceu-se um protocolo de comunicação sem estado (stateless) baseado no estilo arquitetural REST. Todas as requisições HTTP e respostas trafegam em formato padronizado com o cabeçalho Content-Type: application/json. 
+Abaixo, documenta-se o mapeamento completo e o contrato dos 7 endpoints projetados e modelados para o MVP: 
+a) Autenticação e Controle de Sessão
+•	Endpoint: /api/auth/login
+•	Verbo HTTP: POST
+•	Descrição: Autentica as credenciais do usuário (e-mail e senha) e retorna o token de sessão (JWT) contendo o papel (role) do usuário e os IDs de dependentes vinculados. 
+•	Payload de Requisição:
+{
+  "email": "ana.santos@email.com",
+  "password": "senha_criptografada_aqui"
+}
+•	Payload de Resposta (Sucesso - 200 OK):
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 2,
+    "name": "Ana Santos",
+    "role": "PARENT",
+    "dependents": [1, 3]
+  }
+}
+•	Regra de Escopo: O token gerado deve ser enviado no cabeçalho Authorization: Bearer <token> em todas as chamadas subsequentes para assegurar o controle de acesso por papel (RBAC).
+b) Consulta de Dependentes (Visualização do Responsável)
+•	Endpoint: /api/parent/dependents
+•	Verbo HTTP: GET
+•	Descrição: Retorna a listagem sintética de todos os dependentes associados ao responsável legal autenticado, contendo indicadores visuais de alerta (frequência crítica e média baixa). 
+•	Payload de Resposta (Sucesso - 200 OK):
+[
+  {
+    "student_id": 1,
+    "name": "João Silva",
+    "registration": "2024001",
+    "classroom": "6º Ano A",
+    "shift": "MANHA",
+    "average_grade": 7.25,
+    "attendance_rate": 90.0,
+    "alerts": {
+      "critical_attendance": false,
+      "low_grades": false
+    }
+  },
+  {
+    "student_id": 3,
+    "name": "Pedro Costa",
+    "registration": "2024003",
+    "classroom": "6º Ano A",
+    "shift": "MANHA",
+    "average_grade": 4.5,
+    "attendance_rate": 72.0,
+    "alerts": {
+      "critical_attendance": true,
+      "low_grades": true
+    }
+  }
+]
+
+c) Emissão de Boletim Escolar
+•	Endpoint: /api/students/{student_id}/report-card?year={year}
+•	Verbo HTTP: GET
+•	Descrição: Fornece o extrato consolidado do boletim escolar de um estudante específico em determinado ano letivo, trazendo médias bimestrais e o status final de aprovação calculado pela camada de aplicação (ServicosDoAluno). 
+•	Payload de Resposta (Sucesso - 200 OK):
+{
+  "student_id": 1,
+  "student_name": "João Silva",
+  "classroom": "6º Ano A",
+  "academic_year": 2024,
+  "report": [
+    {
+      "subject": "Matemática",
+      "teacher": "Carlos Mendes",
+      "bimester_grades": {
+        "1": 8.5,
+        "2": null,
+        "3": null,
+        "4": null
+      },
+      "final_average": 8.5,
+      "status": "Aprovado"
+    }
+  ]
+}
+
+d) Consulta de Frequência e Calendário
+•	Endpoint: /api/students/{student_id}/attendance?subject={subject}&month={month}&year={year}
+•	Verbo HTTP: GET
+•	Descrição: Retorna os registros diários de presenças, faltas e justificativas para renderização do grid de calendário tátil e acessível do dependente. 
+•	Payload de Resposta (Sucesso - 200 OK):
+{
+  "student_id": 1,
+  "subject": "Matemática",
+  "summary": {
+    "total_classes": 20,
+    "presences": 18,
+    "absences": 2,
+    "justified_absences": 1,
+    "attendance_rate": 90.0
+  },
+  "calendar": [
+    {
+      "date": "2026-03-10",
+      "is_present": true,
+      "status": "PRESENT"
+    },
+    {
+      "date": "2026-03-11",
+      "is_present": false,
+      "status": "JUSTIFIED_ABSENCE",
+      "justification": "Atestado médico"
+    }
+  ]
+}
+
+e) Mural de Avisos do Responsável
+•	Endpoint: /api/parent/announcements
+•	Verbo HTTP: GET
+•	Descrição: Lista os comunicados e avisos oficiais expedidos pela coordenação escolar para o responsável logado. 
+•	Payload de Resposta (Sucesso - 200 OK):
+[
+  {
+    "id": 101,
+    "title": "IMPORTANTE: Reunião de Pais e Mestres",
+    "content": "Prezados responsáveis, convidamos todos para a reunião pedagógica bimestral no dia 30/06.",
+    "category": "URGENT",
+    "date_published": "2026-06-20",
+    "is_read": false
+  }
+]
+
+f) Lançamento de Notas em Lote (Docente)
+•	Endpoint: /api/teacher/grades/bulk
+•	Verbo HTTP: POST
+•	Descrição: Permite ao professor publicar notas em lote para múltiplos alunos em uma avaliação específica. 
+•	Payload de Requisição:
+{
+  "assessment_id": 1,
+  "graded_by": "Prof. Carlos",
+  "grades": [
+    {
+      "student_id": 1,
+      "score": 8.5
+    },
+    {
+      "student_id": 2,
+      "score": 7.5
+    }
+  ]
+}
+•	Payload de Resposta (Sucesso - 201 Created):
+{
+  "status": "success",
+  "message": "Notas registradas e publicadas com sucesso para a avaliação ID 1.",
+  "records_created": 2
+}
+
+g) Registro de Frequência Diária em Lote (Docente)
+•	Endpoint: /api/teacher/attendance/bulk
+•	Verbo HTTP: POST
+•	Descrição: Registra a chamada diária (presenças e ausências) da turma para uma determinada data e disciplina. 
+•	Payload de Requisição:
+{
+  "date": "2026-07-26",
+  "subject": "Matemática",
+  "records": [
+    {
+      "student_id": 1,
+      "is_present": true
+    },
+    {
+      "student_id": 2,
+      "is_present": false
+    }
+  ]
+}
+•	Payload de Resposta (Sucesso - 201 Created):
+{
+  "status": "success",
+  "message": "Chamada registrada com sucesso para o dia 2026-07-26."
+}
+
+2.5 Integrações do Sistema
+No ecossistema do TrAcEs, as integrações foram modeladas visando maximizar a autonomia operacional do MVP e viabilizar a expansão gradual da plataforma sem acoplamento de código: 
++-----------------------------------------------------------------------------------+
+|                            INTEGRAÇÕES DO SISTEMA TRACES                          |
++--------------------------+-----------------+--------------------------------------+
+| TIPO DE INTEGRAÇÃO       | STATUS          | PROPÓSITO E FUNCIONAMENTO            |
++--------------------------+-----------------+--------------------------------------+
+| 1. Persistência SQL      | Ativa           | Banco SQLite local (`traces.db`);    |
+|    Local                 | (Interna)       | gerenciamento via driver `sqlite3`   |
+|                          |                 | e padrão Repository.                 |
++--------------------------+-----------------+--------------------------------------+
+| 2. Serviço SMTP para     | Planejada       | Envio assíncrono de e-mails para     |
+|    Alertas               | (Externa)       | assiduidade crítica (< 75%) e notas  |
+|                          |                 | baixas via SendGrid/AWS SES.         |
++--------------------------+-----------------+--------------------------------------+
+| 3. Geração de PDF e      | Ativa /         | Frontend: API `window.print()` e CSS |
+|    Exportação Física     | Planejada       | `@media print`. Backend: lib         |
+|                          |                 | `ReportLab` para relatórios.         |
++--------------------------+-----------------+--------------------------------------+
+| 4. Registro de           | Planejada       | Auditoria interna de alterações via  |
+|    Auditoria e Logs      | (Interna)       | módulo `logging` do Python e         |
+|                          |                 | monitoramento com Sentry.            |
++--------------------------+-----------------+--------------------------------------+
+2.5.1 Persistência SQL Local (Integração Interna - Ativa):
+•	Funcionamento: A camada de infraestrutura utiliza o driver nativo sqlite3 do Python para se conectar diretamente ao arquivo de banco de dados (traces.db). A inicialização do schema de tabelas e relacionamentos é automatizada por scripts DDL na primeira execução do backend. 
+2.5.2 Serviço SMTP para Notificações de Alerta (Integração Externa - Planejada):
+•	Funcionamento: O backend integrará clientes SMTP conectados a plataformas SaaS (ex: SendGrid ou AWS SES). Disparará notificações assíncronas automáticas para os e-mails dos responsáveis sempre que o sistema registrar uma média abaixo de 6.0 ou infrequência acumulada abaixo de 75%. 
+2.5.3 API de Exportação Física e Geração de PDF (Integração Híbrida - Ativa/Planejada):
+•	Funcionamento Ativo: No frontend SPA, aciona-se a API nativa do navegador (window.print()) ajustada com estilos CSS específicos (@media print), ocultando barras de navegação para gerar a impressão limpa do boletim escolar.
+•	Funcionamento Planejado: No backend, prevê-se a inclusão da biblioteca ReportLab ou Weasyprint para geração de relatórios oficiais em formato PDF via endpoint GET /api/reports/report-card/{id}/pdf.
+2.5.4 Módulo de Registro de Auditoria e Logs (Integração Interna - Planejada):
+•	Funcionamento: Integra o módulo nativo logging do Python na camada de infraestrutura para gravar tentativas de login e alterações críticas de dados (ex: alteração de notas após a publicação), preparando a aplicação para conexão futura com sistemas de monitoramento em tempo real como o Sentry
+3. Decisões Arquiteturais
+A modelagem da arquitetura do TrAcEs (Trilha de Acompanhamento Escolar) foi pautada por escolhas técnicas conscientemente articuladas com os atributos de qualidade exigidos para um software educacional inclusivo e de alto desempenho. 
+Abaixo, justificam-se as cinco decisões arquiteturais centrais do projeto e demonstra-se sua relação direta com os pilares de Escalabilidade, Segurança, Manutenibilidade, Desempenho, Organização de Código e Experiência do Usuário (UX):
++-----------------------------------------------------------------------------------+
+|                     MATRIZ DE DECISÕES ARQUITETURAIS E PILARES                    |
++--------------------------+---------------------+----------------------------------+
+| DECISÃO ARQUITETURAL     | PILARES DE IMPACTO  | REPERCUSSÃO PRÁTICA NO TRACES    |
++--------------------------+---------------------+----------------------------------+
+| 1. Desacoplamento        | Desempenho, UX,     | Renderização 100% no cliente;    |
+|    Frontend/Backend      | Manutenibilidade    | evolução paralela de telas e API |
+|                          |                     |.                      |
++--------------------------+---------------------+----------------------------------+
+| 2. Clean Architecture    | Escalabilidade,     | Isolamento do Domínio (`models`);|
+|    no Backend            | Manutenibilidade    | facilidade de troca de BD        |
+|                          |                     |.                                 |
++--------------------------+---------------------+----------------------------------+
+| 3. APIs RESTful          | Segurança,          | Serviços sem estado (*stateless*);|
+|    HTTP / JSON           | Interoperabilidade  | pronto para futura app mobile    |
+|                          |                     |.                                 |
++--------------------------+---------------------+----------------------------------+
+| 4. Monolito Modular      | Desempenho,         | Execução leve em hardware modesto;|
+|    no Backend            | Operabilidade       | zero latência distribuída        |
+|                          |                     |.                                 |
++--------------------------+---------------------+----------------------------------+
+| 5. Integridade Relacional| Segurança,          | Validação física de Foreign Keys |
+|    no SQLite             | Consistência        | impedindo dados órfãos.          |
++--------------------------+---------------------+----------------------------------+	
+
+3.1 Separação Frontend/Backend (Arquitetura Desacoplada)
+•	Decisão: Isolamento completo do código de apresentação (SPA React rodando no navegador) em relação à lógica de processamento de regras acadêmicas (Servidor Python). 
+•	Impacto na Manutenibilidade e Organização: Permite que designers e desenvolvedores frontend trabalhem no protótipo e nos componentes Shadcn UI sem risco de afetar as regras de domínio e persistência do backend. 
+•	Impacto no Desempenho e UX: O consumo de processamento de layout ocorre localmente no dispositivo do usuário. A comunicação reduz-se ao tráfego de dados compactos em JSON, gerando transições de tela instantâneas sem page reload. 
+3.2 Arquitetura em Camadas (Clean Architecture) e Direção de Dependências no Backend
+•	Decisão: Divisão modular e estrita do servidor em três subcamadas (Domain, Application e Infrastructure). 
+•	Impacto na Escalabilidade e Evolução: Garante que o núcleo da aplicação (regras de negócio do boletim) seja puro. Se a instituição necessitar migrar do SQLite local para um banco PostgreSQL em nuvem, a alteração limita-se à camada de Infrastructure (database.py), mantendo intactos os serviços e modelos de domínio. 
+•	Impacto na Segurança: Regras de negócio de aprovação e limites de faltas são validadas na camada de Domínio, agindo como guardiãs da integridade antes de qualquer persistência. 
+3.3 Comunicação via APIs RESTful baseadas em HTTP/JSON (Stateless)
+•	Decisão: Adoção de requisições HTTP sem estado utilizando verbos semânticos (GET, POST) e cargas padronizadas em JSON. 
+•	Impacto na Segurança: Facilita a implementação de mecanismos padronizados de autenticação baseados em Tokens JWT via cabeçalho Authorization: Bearer, além de políticas rígidas de CORS. 
+•	Impacto na Interoperabilidade: Permite que outros sistemas ou futuros aplicativos móveis (Android/iOS) consumam as mesmas APIs sem duplicar código de regras de negócio. 
+3.4 Estrutura em Monolito Modular e Eficiência Operacional
+•	Decisão: Manutenção de um repositório único com divisões de pacotes por contexto escolar, descartando a complexidade de microsserviços. 
+•	Impacto na Simplicidade Operacional e Desempenho: Elimina a latência de tráfego de rede entre múltiplos serviços e simplified dramaticamente a implantação local em computadores de escolas públicas e ONGs comunitárias (foco extensionista). 
+3.5 Integridade e Restrições no Banco de Dados Relacional
+•	Decisão: Uso do SQLite com chaves primárias, chaves estrangeiras explícitas (FOREIGN KEY) e restrições de verificação (CHECK constraints) no schema físico. 
+•	Impacto na Consistência e Segurança: Garante que erros de lógica no código não resultem em corrupção de dados (ex: associar uma nota a um aluno inexistente ou excluir um responsável mantendo dependentes vinculados). 
+4. Uso de Boas Práticas e Padrões Arquiteturais
+4.4.1 Clean Code e Princípio de Responsabilidade Única (SRP):
+o	No backend, cada arquivo e classe possui um papel exclusivo: models.py contêm estruturas de dados e auto-validações; services.py orquestra casos de uso; database.py isola os comandos SQL. 
+o	No frontend, os componentes React são modulares, focando estritamente na exibição e escuta de eventos visuais. 
+4.4.2 Versionamento Seguro e Práticas de Repositório (Git):
+o	Adota o uso de ramificações para novas funcionalidades. 
+o	Mantém um arquivo .gitignore configurado para impedir o envio acidental de arquivos binários temporários (.venv, __pycache__) e bancos de dados locais de teste (traces.db). 
+4.4.3 Diretrizes de Acessibilidade Web (WCAG 2.1 AA)
+A acessibilidade foi tratada como requisito arquitetural fundamental de design e engenharia: 
++-----------------------------------------------------------------------------------+
+|                        RECURSOS DE ACESSIBILIDADE WCAG 2.1 AA                     |
++-----------------------+-----------------------------------------------------------+
+| RECURSO               | IMPLEMENTAÇÃO TÉCNICA E IMPACTO DE INCLUSÃO               |
++-----------------------+-----------------------------------------------------------+
+| 1. Magnificação de    | Dimensionamento em unidades relativas (`rem`/`em`). Barra |
+|    Fonte (A+ / A-)    | de atalhos permite escala global de 80% a 140%.           |
++-----------------------+-----------------------------------------------------------+
+| 2. Tema de Alto       | Folha de estilos alternativa (`bg-black` e amarelo        |
+|    Contraste          | brilhante) com relação de contraste > 7:1.                |
++-----------------------+-----------------------------------------------------------+
+| 3. Teclabilidade e    | Ativação de estados de foco nativos em botões e inserção  |
+|    Skip Links         | de links invisíveis para saltar diretamente ao conteúdo   |
+|                       | (`#main-content`).                                        |
++-----------------------+-----------------------------------------------------------+
+| 4. Codificação        | Status acadêmicos informados por Cor, Glifos (`✓`, `⚠️`) |
+|    Semântica Tripla   | e Rótulos Textuais explicativos.                          |
++-----------------------+-----------------------------------------------------------+
+
+a)	Magnificação de Fonte Acessível (Zoom A+/A-): O CSS da aplicação utiliza unidades relativas (rem e em). A barra superior de acessibilidade manipula o tamanho da fonte raiz dinamicamente entre 80% e 140%, refluindo o layout sem quebrar os grids ou gerar barras de rolagem horizontais. 
+b)	Tema de Alto Contraste Nativo: Chaveamento para um tema de contraste elevado com fundo preto e elementos em amarelo brilhante e branco, atendendo à taxa mínima de luminância de 7:1 para usuários com baixa visão ou presbiopia. 
+c)	Teclabilidade e Skip Links (Navegação sem Mouse): Inclusão de atalhos invisíveis acionados pela tecla Tab ("Saltar para conteúdo principal #main-content", "Saltar para menu #main-nav"), permitindo que pessoas com deficiência motora naveguem eficientemente. 
+d)	Codificação Semântica Tripla de Informação: Erros e status do boletim combinam três identificadores em simultâneo: Cor (Verde/Laranja/Vermelho), Ícone/Símbolo (✓, ⚠️, ✕) e Texto Explícito (Aprovado, Recuperação, Reprovado), garantindo plena compreensão por daltônicos e leitores de tela (NVDA). 
+4.4 Aplicação das 10 Heurísticas de Nielsen na Interface
+A usabilidade do sistema reflete diretamente as diretrizes universais de Jakob Nielsen: 
+1.	Visibilidade do Estado do Sistema: O painel do professor sinaliza imediatamente o status do input de nota (borda verde para valor válido entre 0.0 e 10.0, e vermelha para valor inválido). 
+2.	Compatibilidade com o Mundo Real: Uso da terminologia pedagógica tradicional (Boletim, Bimestre, Frequência, Média Ponderada), abandonando jargões de banco de dados. 
+3.	Controle e Liberdade do Usuário: Links visíveis e proeminentes de "⬅️ Voltar ao Painel" em todas as telas secundárias, permitindo desfaçar a navegação. 
+4.	Consistência e Padrões: O cabeçalho global com logo, barra de acessibilidade e notificações é idêntico e persistente em toda a aplicação. 
+5.	Prevenção de Erros: Exibição de modais de confirmação explicativos antes de consolidar a publicação de notas ou chamadas diárias em lote. 
+6.	Reconhecimento em vez de Recall: Legendas explicativas fixas no rodapé das tabelas informando os critérios de cálculo e faixas de corte da escola.
+7.	Flexibilidade e Eficiência de Uso: Filtros sequenciais (Turma → Disciplina) que aceleram a localização de alunos pelo docente.
+8.	Design Estético e Minimalista: Interfaces limpas, uso abundante de espaço em branco e apresentação progressiva de detalhes via cards retráteis. 
+9.	Ajuda a Reconhecer e Diagnosticar Erros: Mensagens de erro claras situadas abaixo dos campos ("Digite uma nota válida entre 0,0 e 10,0").
+10.	Ajuda e Documentação: Botão permanente de "Suporte / FAQ" acessível no painel do responsável.
+4.5 Consolidação dos Padrões Arquiteturais (SPA, REST, Layers, Client-Server)
+•	Cliente-Servidor: Separação do cliente SPA e do servidor de processamento.
+•	Single Page Application (SPA): Navegação fluida no cliente mantendo o estado de acessibilidade.
+•	REST (Representational State Transfer): Endpoints orientados a recursos com comunicação sem estado.
+•	Arquitetura em Camadas (Clean Architecture): Separação estrita em Domínio, Aplicação e Infraestrutura.
+•	Componentização React: Reutilização de elementos visuais desacoplados e parametrizáveis.
+5. Análise e Descrição Técnica dos Diagramas Arquiteturais
+A representação visual do modelo arquitetural do TrAcEs (Trilha de Acompanhamento Escolar) foi construída em linguagem Mermaid e replicada estruturalmente para ferramentas de prototipagem em canvas (FigJam / Figma). 
+Abaixo, cada um dos 5 diagramas centrais da aplicação é apresentado, mapeado e minuciosamente descrito em seus aspectos de engenharia e fluxo de informações: 
+5.1 Diagrama 1: Arquitetura Geral do Sistema (Cliente-Servidor / Topologia)
+Este diagrama descreve a topologia física e lógica global da aplicação, evidenciando o desacoplamento completo entre a interface do usuário e o servidor de regras de negócio.
+
+
+ 
+
+ 
+Descrição Técnica:
+•	Bloco Frontend (Cliente - Azul): Representa o ambiente de execução no navegador do usuário. A SPA em React 18 + Vite processa os componentes visuais Shadcn UI e executa dinamicamente a Barra de Acessibilidade WCAG (controles de zoom de fonte de 80% a 140% e alto contraste). 
+•	Bloco API (Comunicação - Verde): Ponto de fronteira sem estado (stateless). Intermedeia requisições HTTP RESTful enviando e recebendo payloads exclusivamente em JSON. 
+•	Bloco Backend (Servidor - Roxo): Servidor Python estruturado em Clean Architecture. A camada de Aplicação recebe os chamados, aciona as regras puras de Domínio e orquestra os Repositórios de Infraestrutura. 
+•	Bloco Armazenamento (Persistência - Cinza): Banco de dados relacional SQLite 3 local (traces.db), que executa as instruções SQL enviadas pelo driver Python de infraestrutura. 
+5.2 Diagrama 2: Camadas do Backend (Clean Architecture / Regra de Dependência)
+Este diagrama ilustra a organização interna do código Python e a direção estrita das dependências de compilação/execução, que apontam exclusivamente de fora para dentro. 
+Descrição Técnica:
+•	Camada Superior / Núcleo (Domínio - src/domain/models.py): Contém as entidades de negócio puras (Student, Teacher, Parent, Grade, Attendance), enums operacionais e validações nativas das entidades. Não possui qualquer importação ou conhecimento sobre bancos de dados, frameworks web ou bibliotecas externas. 
+•	Camada Intermediária (Aplicação - src/application/services.py): Encapsula os casos de uso do ecossistema escolar (ServicosDoAluno, ServicosSecretaria). Depende exclusivamente da Camada de Domínio para executar cálculos de médias ponderadas e consolidação de boletins. 
+•	Camada Inferior / Externa (Infraestrutura - src/infrastructure/database.py): Implementa os adaptadores de persistência concreta (Repositórios) e conexões com o SQLite. Conhece as camadas de Aplicação e Domínio, mas é completamente desconhecida por elas (Inversão de Dependência).
+
+ 
+
+ 
+
+5.3 Diagrama 3: Componentes e Módulos da Aplicação
+Este diagrama UML mapeia a decomposição funcional do sistema, detalhando a amarração entre os componentes de interface no frontend, os controladores da API REST, as classes de serviços de aplicação e os repositórios de dados.
+ 
+ 
+•	Descrição Técnica:
+o	Mapeia as 4 áreas de interface React (AuthUI, DocentUI, ParentUI, SecUI) conectando-se aos respectivos controladores da API REST (AuthCtrl, AcademicCtrl, ConfigCtrl). 
+o	Demonstra como o controlador de lançamentos aciona o serviço ServicosDoAluno para consultar e persistir dados através de 4 repositórios especializados (RepoGrade, RepoAssess, RepoStud, RepoAtt). 
+o	Evidencia o isolamento do módulo da Secretaria (ServicosSecretaria), encarregado do gerenciamento de turmas (RepoClass) e amarração de vínculos com os responsáveis (RepoParent). 
+5.4 Diagrama 4: Fluxo de Comunicação e Integrações do Sistema
+Este diagrama de fluxo ilustra o caminho central de dados entre o cliente e o servidor, destacando as integrações com o banco de dados interno e serviços externos ativos e planejados.
+ 
+ 
+•	Descrição Técnica:
+o	Eixo Central: Representa a navegação bidirecional síncrona do usuário no navegador através do frontend React, acionando endpoints da API Python via requisições HTTP REST e persitindo dados via operações CRUD no banco SQLite local (traces.db). 
+o	Ramificação de Notificação (Serviço SMTP Externa): Disparo assíncrono acionado pelo backend via protocolo SMTP para integração com plataformas de e-mail (SendGrid/AWS SES), enviando alertas automáticos de frequências críticas (< 75%) e notas baixas para os e-mails dos responsáveis. 
+o	Ramificação de Exportação (Impressão Local): Acionamento direto pelo cliente React da API nativa do navegador (window.print()), utilizando folhas de estilo CSS de impressão (@media print) para formatar e gerar o PDF do boletim escolar sem requisições adicionais ao servidor. 
+5.5 Diagrama 5: Sequência Temporal do Lançamento de Notas em Lote
+Este diagrama temporal detalha a troca exata de mensagens, validações e chamadas entre todos os componentes do sistema durante a execução de um caso de uso crítico: o lançamento e publicação de notas em lote pelo docente.
+ 
+
+ 
+Detalhamento Sequencial dos 12 Passos:
+1.	Ação do Usuário: O professor preenche as notas dos estudantes na tabela operacional e aciona o comando "Publicar". 
+2.	Validação no Cliente (FE): O componente React intercepta o evento e valida se todas as notas inseridas são numéricas e pertencem ao intervalo válido de 0.0 a 10.0. 
+3.	Requisição HTTP (FE → BE): O frontend dispara uma requisição POST /api/teacher/grades/bulk contendo o token JWT e a lista de alunos e notas em JSON. 
+4.	Autenticação e Escopo (BE): O controlador backend intercepta a requisição, valida a assinatura do token e confirma se o usuário possui a permissão Docente. 
+5.	Invocação do Caso de Uso (BE → Srv): O controlador chama o método lancar_nota() da classe de serviço ServicosDoAluno na camada de Aplicação. 
+6.	Consulta de Existência (Srv → Repo): A camada de aplicação solicita ao repositório a busca pelo ID do estudante para verificar seu status acadêmico. 
+7.	Consulta SQL (Repo → DB): O repositório executa a instrução SELECT * FROM students WHERE id = ? no banco SQLite. 
+8.	Retorno do Banco (DB → Repo → Srv): O SQLite confirma que o estudante está ativo e retorna o registro, instanciando a entidade Student em memória. 
+9.	Persistência da Nota (Srv → Repo → DB): O serviço valida as regras de negócio de lançamento, instancia a entidade Grade e ordena sua gravação via comando SQL INSERT INTO grades... com confirmação transacional (Transaction Commit). 
+10.	Confirmação de Escrita (DB → Repo → Srv): O SQLite efetiva o registro e devolve a confirmação de escrita física bem-sucedida. 
+11.	Resposta HTTP (BE → FE): O controlador backend responde ao cliente com o código de status HTTP 201 Created e payload JSON com a mensagem de confirmação. 
+12.	Feedback Visual (FE → Docente): A interface React exibe um banner verde de sucesso, atualiza o status para "Publicado" e trava os campos de edição no grid para evitar alterações acidentais.
+6. [Componente extensionista] Arquitetura de Software e Impacto Social
+6.1. Conceito e Fundamentação da Arquitetura de Software
+A Arquitetura de Software não é apenas a escolha de linguagens e bibliotecas, mas o conjunto de decisões estruturais fundamentais que definem a sustentabilidade, a segurança e a função social de um sistema ao longo de sua existência.
+A Arquitetura de Software representa a planta baixa e o modelo de engenharia de uma aplicação. Ela especifica como o sistema é dividido em componentes, quais são as responsabilidades de cada parte, como esses elementos se comunicam e quais restrições regem a evolução do código. 
+Sem uma arquitetura sólida, sistemas computacionais tendem à degradação (código espaguete), onde qualquer alteração gera efeitos colaterais imprevisíveis, elevando o Custo Total de Propriedade (TCO) e tornando a manutenção inviável. A arquitetura atua como a ponte entre os requisitos funcionais (o que o sistema faz) e os não funcionais (como o sistema se comporta em termos de velocidade, segurança e acessibilidade).
+6.2 Impacto Direto nas Dimensões Técnicas
+Dimensão Técnica	Mecanismo Arquitetural no TrAcEs	Impacto Prático na Aplicação
+Escalabilidade	Desacoplamento Cliente-Servidor e uso do Repository Pattern. 	Permite substituir o banco de dados SQLite local por um banco PostgreSQL em nuvem alterando apenas a camada de Infraestrutura, sem tocar na lógica acadêmica. 
+Segurança	Controle de Acesso por Papéis (RBAC) e Validação de Domínio. 	Isola o escopo do responsável (só enxerga seus dependentes) e impede injeções SQL e manipulação não autorizada de notas. 
+Desempenho	Processamento em SPA (Frontend) e Payloads JSON Compactos. 	Transfere a renderização visual para o navegador do cliente, reduzindo o consumo de banda e gerando respostas em milissegundos. 
+Manutenção	Clean Architecture e Princípio de Responsabilidade Única (SRP). 	Mutações na regra de cálculo do boletim ocorrem estritamente na camada de Application (services.py), prevenindo quebras no banco ou na interface. 
+Evolução do Sistema	Comunicação via Contratos de API REST. 	Permite plugar futuros clientes (como um aplicativo móvel Android/iOS) consumindo os mesmos serviços sem reescrever a lógica de negócio do backend. 
+
+6.3 Influência na Qualidade Geral do Projeto
+A arquitetura de software é o determinante primário da qualidade do sistema. Ela viabiliza a testabilidade automatizada (testes unitários e de integração), garante a consistência visual e comportamental da interface para o usuário e estende a vida útil do software, assegurando que ele permaneça compreensível para novas equipes de desenvolvimento. 
+6.4 Aplicação social deste projeto
+A utilidade social do TrAcEs consolida-se em sua capacidade de promover a inclusão digital e a democratização da gestão escolar no contexto da comunidade: 
+a)	Profissionalização de Escolas de Pequeno Porte no Cariri: Permite que instituições comunitárias ou de cursos livres substituam registros manuais por um sistema estruturado sem necessidade de infraestruturas caras de TI. 
+b)	Transparência e Sustentabilidade em ONGs: Projetos sociais e de reforço escolar podem gerar extratos de frequência auditáveis e boletins consolidados para prestação de contas junto a financiadores e à comunidade. 
+c)	Inclusão Digital: Ao implementar um frontend estritamente aderente à norma WCAG 2.1 AA (suporte a magnificação de fontes, alto contraste e leitores de tela), o sistema garante autonomia e participação para que pais e tutores com deficiência ou baixo letramento digital acompanhem a vida escolar de seus filhos sem barreiras. 
+d)	Execução em Hardware Acessível: O uso de Python com SQLite resulta em um footprint de memória extremamente leve, permitindo que a aplicação seja executada com alto desempenho em computadores recondicionados ou de baixo custo.

@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #EEF2F7;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A2332;
+  --header-bg: #1B4F8A;
+}
+
+.high-contrast {
+  --bg-primary: #000000;
+  --bg-card: #000000;
+  --text-primary: #FEF08A; /* Amarelo de alto contraste */
+  --header-bg: #000000;
+}
+
+/* Aplique estas variáveis às classes base */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Regras globais para mídias responsivas */
+img, svg, picture, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Contêiner de tabela com rolagem horizontal suave em telas pequenas */
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Força a inversão de cores dos seus cards e elementos principais */
+.high-contrast .bg-white, 
+.high-contrast .bg-[#EEF2F7] {
+  background-color: #000000 !important;
+  border-color: #FEF08A !important;
+  color: #FEF08A !important;
+}
+
+.high-contrast .text-[#1A2332], 
+.high-contrast .text-[#4A5568],
+.high-contrast .text-[#374151] {
+  color: #FEF08A !important;
+}
+
+/* Regras de impressão otimizada (@media print) */
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  
+  #main-nav,
+  [role="navigation"],
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  .bg-white,
+  .bg-[#EEF2F7],
+  .bg-[#F8FAFD] {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border-color: #CBD5E1 !important;
+  }
+}
+
+/* Respeito a preferências do Sistema Operacional: Redução de Movimento (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Indicadores de foco universais de alto contraste para navegação por teclado */
+:focus-visible {
+  outline: 2px solid #FACC15 !important; /* Amarelo ouro de alto contraste */
+  outline-offset: 2px !important;
+}
+
+.high-contrast :focus-visible {
+  outline: 3px solid #FEF08A !important;
+  outline-offset: 3px !important;
+}
+

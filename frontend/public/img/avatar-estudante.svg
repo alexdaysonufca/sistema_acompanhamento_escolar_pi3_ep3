@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="auto" role="img" aria-label="Avatar Estudante - Lucas Silva">
+  <defs>
+    <linearGradient id="avatar-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#avatar-bg)"/>
+  <!-- Head -->
+  <circle cx="60" cy="46" r="22" fill="#FDE047"/>
+  <!-- Hair -->
+  <path d="M 40 42 C 40 28, 80 28, 80 42 C 75 35, 45 35, 40 42 Z" fill="#1E293B"/>
+  <!-- Body/Shirt -->
+  <path d="M 24 102 C 24 76, 96 76, 96 102 Z" fill="#FFFFFF"/>
+  <!-- Collar -->
+  <path d="M 50 76 L 60 88 L 70 76 Z" fill="#2563EB"/>
+</svg>

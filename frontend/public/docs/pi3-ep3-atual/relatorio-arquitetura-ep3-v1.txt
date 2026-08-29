@@ -1,0 +1,217 @@
+===============================================================================
+UNIVERSIDADE FEDERAL DO CARIRI (UFCA)
+Centro de Educação a Distância (CEAD)
+Curso: Análise e Desenvolvimento de Sistemas (ADS)
+Disciplina: PROJETO INTEGRADO III [ADS0038]
+Professor Responsável: Prof. Luís Fabrício de Freitas Souza (fabricio.freitas@ufca.edu.br)
+
+ENTREGÁVEL PARCIAL 3 (EP3) — RELATÓRIO ARQUITETURAL DO MVP WEB FUNCIONAL
+===============================================================================
+
+ESTUDANTES:
+- Nome: Antonio Alex Dayson Tomaz | Matrícula: 2023009790
+- Nome: Maria Alexsandra Tomaz    | Matrícula: 2023018799
+
+Data de Homologação: 19/08/2026
+Status da Entrega: ✅ COMPLETO E HOMOLOGADO (79 Testes Aprovados · 18 Endpoints REST · SQLite 3 · Swagger UI Live)
+
+-------------------------------------------------------------------------------
+1. VISÃO GERAL DA ARQUITETURA E CONTEXTO PEDAGÓGICO
+-------------------------------------------------------------------------------
+O TrAcEs (Trilha de Acompanhamento Escolar) é uma plataforma digital integrada 
+para gestão acadêmica e acompanhamento contínuo da vida escolar. O sistema foi 
+projetado sob a premissa da acessibilidade digital (WCAG 2.1 AA) e usabilidade 
+rigorosa (10 Heurísticas de Jakob Nielsen), preenchendo a lacuna de comunicação 
+entre as escolas e os lares e atuando na prevenção ativa da evasão escolar.
+
++-----------------------------------------------------------------------------+
+|                         SISTEMA TRACES (MVP EP3)                            |
++-------------------------------------+---------------------------------------+
+|       FRONTEND (APRESENTAÇÃO)       |          BACKEND (APLICAÇÃO)          |
+|  - React 18 + TypeScript + Vite 6   |  - Python 3.12 (Clean Architecture)   |
+|  - Tailwind CSS v4 + Radix UI       |  - 4 Camadas: Domain/App/Infra/API    |
+|  - 6 Telas SPA + Lucide Icons       |  - SQLite 3 Transacional (school.db)  |
+|  - Acessibilidade WCAG 2.1 AA (7:1) |  - OpenAPI 3.0.3 / Swagger UI (/docs) |
++-------------------------------------+---------------------------------------+
+|               COMUNICAÇÃO: APIs RESTful NATIVAS (HTTP / JSON)               |
++-----------------------------------------------------------------------------+
+
+-------------------------------------------------------------------------------
+2. ESTRUTURA EM CAMADAS DO BACKEND (CLEAN ARCHITECTURE)
+-------------------------------------------------------------------------------
+O backend foi arquitetado com separação estrita de conceitos e dependências 
+apontando exclusivamente para o centro (Domínio):
+
+[ CAMADA 1: DOMÍNIO & REGRAS PURAS ] (backend/src/domain/models.py)
+  - Entidades de Domínio: Student, Teacher, Parent, Classroom, Assessment, Grade, Attendance, ReportCard.
+  - Enums Fortemente Tipados: Bimester (PRIMEIRO..QUARTO), Shift (MANHA..NOITE), AssessmentType (PROVA..SEMINARIO).
+  - Invariantes de Negócio: Validação algorítmica de CPF (dígitos verificadores), validação de e-mails RFC 5322, notas [0.0 a 10.0].
+
+[ CAMADA 2: APLICAÇÃO & SERVIÇOS ] (backend/src/application/services.py)
+  - ServicosDoAluno: Cálculo de médias bimestrais ponderadas por pesos, cálculo de média anual, consolidação de boletins e extratos de presença.
+  - ServicosSecretaria: Matrícula de estudantes, enturmação e vinculação socioafetiva N:N de responsáveis.
+
+[ CAMADA 3: INFRAESTRUTURA & PERSISTÊNCIA ] (backend/src/infrastructure/database.py & schema.sql)
+  - Banco de Dados Relacional: SQLite 3 com 12 tabelas físicas e 11 índices de performance.
+  - Padrão Repository: StudentRepository, GradeRepository, AssessmentRepository, ClassroomRepository, AttendanceRepository, AnnouncementRepository.
+  - Integridade Referencial: FOREIGN KEY com ON DELETE CASCADE e restrições CHECK.
+
+[ CAMADA 4: APRESENTAÇÃO & API RESTful ] (backend/src/presentation/server.py, controllers.py, openapi_spec.py)
+  - Servidor Nativo: HTTPServer multithreaded assíncrono com suporte a CORS, roteamento dinâmico e tratamento de erros 400/404/500 em JSON (18 rotas).
+  - Controladores Desacoplados: AuthController, ParentController, TeacherController.
+  - Documentação OpenAPI 3.0.3: Swagger UI interativo disponível em /docs e /swagger.
+
+-------------------------------------------------------------------------------
+3. MANUAL DE ENGENHARIA DA API RESTFUL (18 ENDPOINTS DOCUMENTADOS)
+-------------------------------------------------------------------------------
+
+[MÓDULO SISTEMA & AUTENTICAÇÃO]
+1. GET  /api/health
+   - Retorna o status de integridade do servidor backend e links da documentação.
+2. POST /api/auth/login
+   - Autentica usuários (Responsável ou Docente) e retorna token JWT mock e perfil RBAC.
+
+[MÓDULO DO RESPONSÁVEL LEGAL - FAMÍLIA]
+3. GET  /api/parent/dependents?parent_id=1
+   - Retorna resumo sintético de médias, faltas e alertas dos 3 dependentes (João Silva, Ana Silva, Pedro Costa).
+4. GET  /api/students/{id}/report-card?year=2026
+   - Retorna o boletim escolar anual completo dos 4 bimestres com cálculo de aprovação.
+5. GET  /api/students/{id}/assessments?subject=Matemática&year=2026
+   - Retorna notas detalhadas por avaliação (Avaliação 1, Avaliação 2) em modo 100% somente leitura.
+6. GET  /api/students/{id}/attendance?subject=Matemática&month=3&year=2026
+   - Retorna extrato de frequência mensal e grade de calendário com status tátil [P], [F] e [F*].
+7. GET  /api/parent/announcements
+   - Retorna mural de comunicados da instituição com ordenação padrão (1º data mais recente desc, 2º assunto alfabético asc).
+8. POST /api/parent/announcements/{id}/read [NOVO]
+   - Confirma a leitura do aviso pelo responsável legal, sincronizando com o SQLite e atualizando para o docente.
+
+[MÓDULO DO CORPO DOCENTE - PROFESSOR]
+9.  GET  /api/teacher/classes?teacher_id=1
+    - Retorna escopo de turmas, disciplinas lecionadas e estudantes matriculados com matrículas.
+10. GET  /api/teacher/assessments?subject=Matemática&bimester=PRIMEIRO&year=2026
+    - Retorna listagem sequencial de avaliações criadas por escopo.
+11. PUT  /api/teacher/assessments/{id}
+    - Atualiza atributos de uma avaliação existente (título, tipo, peso, descrição) com recálculo instantâneo.
+12. POST /api/teacher/assessments/add
+    - Cria nova avaliação sequencial (Avaliação N) para toda a turma sem exigir notas em pop-up.
+13. POST /api/teacher/grades/bulk
+    - Grava em lote as notas digitadas pelo professor diretamente na tabela de alunos no SQLite.
+14. POST /api/teacher/attendance/bulk
+    - Grava chamada diária em lote com registro de presenças e justificativas de faltas.
+15. GET  /api/teacher/announcements [NOVO]
+    - Lista avisos e comunicados gerenciados pelo corpo docente com status de leitura pelos responsáveis.
+16. POST /api/teacher/announcements [NOVO]
+    - Cadastra e publica aviso no mural com remetente formal, tags padrão e criador de tags com cores.
+17. PUT  /api/teacher/announcements/{id} [NOVO]
+    - Edita comunicado existente previamente publicado pelo docente.
+
+-------------------------------------------------------------------------------
+4. MODELO FÍSICO DE DADOS (SQLITE 3 — 12 TABELAS E 11 ÍNDICES)
+-------------------------------------------------------------------------------
++-----------------------------------------------------------------------------+
+|                                ESQUEMA FÍSICO DDL                           |
++-----------------------------------------------------------------------------+
+| 1. students:              (id PK, registration UNIQUE, name, email, cpf)    |
+| 2. parents:               (id PK, name, email, phone, cpf, address)         |
+| 3. teachers:              (id PK, name, email, cpf, registration)           |
+| 4. classrooms:            (id PK, name, shift, education_level, teacher_id) |
+| 5. classroom_enrollments: (student_id FK, classroom_id FK, enrolled_at)    |
+| 6. student_parent:        (student_id FK, parent_id FK, relationship_type)  |
+| 7. teacher_subjects:      (teacher_id FK, subject, academic_year)           |
+| 8. assessments:           (assessment_id PK, title, type, weight, bimester) |
+| 9. grades:                (grade_id PK, student_id FK, assessment_id FK)    |
+| 10. attendance:           (attendance_id PK, student_id FK, date, status)   |
+| 11. announcements:        (announcement_id PK, title, category, tags, etc.) |
+| 12. report_cards:         (report_id PK, student_id FK, academic_year)      |
++-----------------------------------------------------------------------------+
+
+Índices Relacionais Otimizados (11):
+- idx_grades_student_bimester, idx_attendance_date, idx_student_parent,
+  idx_classrooms_teacher, idx_enrollments_student, idx_assessments_scope,
+  idx_announcements_target, etc.
+
+-------------------------------------------------------------------------------
+5. ARQUITETURA DA ÁREA DO DOCENTE E MODOS DE TABELA
+-------------------------------------------------------------------------------
+A tela do professor (ProfessorScreen) implementa seletores interdependentes:
+- [Turma] -> [Disciplina] -> [Tipo de Registro: Notas/Frequência/Avisos] -> [Bimestre/Visão] -> [Avaliação] -> [Ano: 2026]
+
+Cinco Modos de Visualização e Operação:
+1. MODO AVALIAÇÃO ESPECÍFICA:
+   - Ativação: Seleção de bimestre (1º BM..4º BM) + Avaliação individual (Avaliação 1, etc.).
+   - Colunas: ESTUDANTE | MATRÍCULA | AVALIAÇÃO | TIPO | DESCRIÇÃO | PESO | NOTA (Input 0.0-10.0).
+   - Ações: Botão "+ Adicionar Avaliação para a Turma" e Botão "✏️ Editar Avaliação".
+2. MODO TODAS AS AVALIAÇÕES COM PESO:
+   - Ativação: Seleção de bimestre (1º BM..4º BM) + Opção "Todas".
+   - Colunas: ESTUDANTE | MATRÍCULA | AVALIAÇÃO 1 (Peso: 1.5) | AVALIAÇÃO 2 (Peso: 2.0) | MÉDIA PONDERADA | SITUAÇÃO.
+   - Natureza: Somente Leitura (consolidação instantânea).
+3. MODO CONSOLIDADO DE NOTAS:
+   - Ativação: Seleção do seletor em "Consolidado" no Tipo Notas.
+   - Colunas: ESTUDANTE | MATRÍCULA | 1º BM | 2º BM | 3º BM | 4º BM | MÉDIA GERAL | SITUAÇÃO ANUAL.
+4. MODO CHAMADA MENSAL DINÂMICA:
+   - Ativação: Seleção de Tipo de Registro em "Frequência Diária" + Bimestre (1º BM..4º BM).
+   - Títulos Padronizados: "Chamada Mensal — Xº BM (Nome da Disciplina)" / "Turma: Yº Ano Z – Turno · Ano Letivo: Ano".
+   - Modal "⚙️ Configurar Horários e Vigência": Período de vigência, duração por tempo (40, 45, 50, 60 min), dias/horários da semana (07:00 às 22:00) e exceções.
+   - Cabeçalhos de Colunas: Botão alternável "✓ Total" ↔ "✖ Limpar" (aplica presença integral em todos ou limpa presenças tornando os campos em branco "").
+   - Ciclo com Campo em Branco: Ciclo interativo ("" -> 2P -> 1P 1F -> 2F -> 2FJ -> ""), mantendo quadros limpos quando não lançados.
+   - 3º e 4º Bimestres Vazio por Padrão: Inicializados zerados em branco ("") aguardando lançamento futuro.
+   - Restauração Automática (useEffect): Manutenção e recarregamento automático dos dados publicados ao navegar ou re-entrar na área docente.
+   - Painel de Alertas Pedagógicos: Notificações de meses pendentes, faltas > 10 e assiduidade projetada < 40%.
+5. MODO CONSOLIDADO DE FREQUÊNCIA:
+   - Ativação: Seleção de Tipo em "Frequência Diária" + "Consolidado".
+   - Colunas: ESTUDANTE | MATRÍCULA | 1º BM | 2º BM | 3º BM | 4º BM | TOTAL AULAS | TOTAL FALTAS | % FREQ. GERAL | SITUAÇÃO FINAL.
+   - Indicativo: 3º e 4º bimestres exibidos como "— Sem registro", apurando a % geral estritamente sobre bimestres lançados.
+6. MODO GESTÃO DE AVISOS E COMUNICADOS:
+   - Ativação: Seleção de "Avisos e Comunicados" no seletor Tipo de Registro.
+   - Colunas: TÍTULO E RESUMO | DESTINATÁRIO | EMISSOR | PRIORIDADE & TAGS | DATA | STATUS DE LEITURA | AÇÕES.
+   - Ações: Botão "+ Novo Aviso / Comunicado" com modal sem tags pré-selecionadas e criador com paleta de 7 cores.
+
+-------------------------------------------------------------------------------
+6. ACESSIBILIDADE DIGITAL EM SPA (WCAG 2.1 AA) E HEURÍSTICAS DE JAKOB NIELSEN
+-------------------------------------------------------------------------------
+- WCAG 1.4.3 / 1.4.11: Contraste superior a 4,5:1 (Padrão), 7:1 (Alto Contraste) e prefers-contrast: more.
+- WCAG 1.4.1: Codificação semântica tripla (Cor de alto contraste + Ícone SVG + Texto explícito).
+- WCAG 1.4.4: Seletor A+/A- na Barra de Acessibilidade (80% a 140% em rem) e zoom livre (user-scalable=yes).
+- WCAG 2.1.2: Focus Trap cíclico em todos os modais (Tab / Shift+Tab) e restauração de foco ao fechar.
+- WCAG 2.3.3: Respeito a prefers-reduced-motion: reduce desativando animações bruscas.
+- WCAG 2.4.1: Skip Links no topo (#main-content, #main-nav, #footer) e Barra Fixa permanente (sticky top-0 z-50).
+- WCAG 2.4.3: Gerenciamento ativo de foco para <main id="main-content"> e sincronização com History API.
+- WCAG 2.5.5: Alvos de toque mínimos de 44x44px em botões, links e controles.
+- WCAG 4.1.3: ARIA Live Region global (aria-live="polite") e sinalizadores aria-busy="true" com sr-only.
+- Nielsen #1: Visibilidade do estado do sistema via Toasts de feedback assíncrono.
+- Nielsen #3: Controle e liberdade com botão "Voltar ao Painel" e tecla Escape para fechamento de modais.
+- Nielsen #5: Prevenção de erros com modal obrigatório de confirmação antes de gravar no SQLite.
+- Nielsen #9: Reconhecimento e recuperação de erros com bordas verde/vermelha e aria-invalid/aria-errormessage.
+
+-------------------------------------------------------------------------------
+6.1 MODO DESENVOLVEDOR (PAINEL DE ENGENHARIA RBAC)
+-------------------------------------------------------------------------------
+O frontend disponibiliza um perfil exclusivo para avaliação e auditoria técnica:
+- Documentação da API: Visualizador integrado e link para Swagger UI (http://127.0.0.1:8000/docs) com ThreadingHTTPServer.
+- Integrantes: Apresentação acadêmica dos estudantes da Universidade Federal do Cariri (UFCA).
+- Sobre: Visão arquitetural, princípios de Clean Architecture, 79 testes no Pytest e extensão social.
+- Documentação Técnica: Leitor para visualização na íntegra de todos os documentos técnicos (.md).
+
+-------------------------------------------------------------------------------
+7. VALIDAÇÃO DA QUALIDADE E SUÍTE DE TESTES (PYTEST)
+-------------------------------------------------------------------------------
+A suíte completa de testes automatizados conta com 79 testes executados com 100% de sucesso:
+- tests/unit/test_cpf_validation.py (6 testes)
+- tests/unit/test_entities.py (30 testes)
+- tests/unit/test_passing_grade.py (3 testes)
+- tests/integration/test_integrity.py (5 testes)
+- tests/integration/test_manual_repositories.py (16 testes)
+- tests/test_api_endpoints.py (17 testes, incluindo OpenAPI, PUT de notas e CRUD de avisos)
+- test_2nd_bimester_launch.py (1 teste E2E)
+- test_4_bimesters_launch.py (1 teste E2E)
+
+TOTAL: 79 APROVADOS (0 falhas, 0 erros) em ~3.3 segundos.
+
+-------------------------------------------------------------------------------
+8. CONCLUSÃO
+-------------------------------------------------------------------------------
+A arquitetura do TrAcEs (EP3) cumpre com excelência todos os requisitos do 
+entregável: robustez de Clean Architecture no backend, alta fidelidade e 
+acessibilidade no frontend SPA React, segurança transacional em SQLite 3 e 
+especificação padronizada OpenAPI 3.0.3 com Swagger UI interativo.
+===============================================================================
